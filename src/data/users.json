@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@example.com",
+      "role": "admin",
+      "name": "Admin User",
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "2",
+      "email": "professor.smith@example.com",
+      "role": "professor",
+      "name": "Boutaleb",
+      "department": "Mathematics",
+      "created_at": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "3",
+      "email": "professor.jones@example.com",
+      "role": "professor",
+      "name": "Sarah ",
+      "department": "Physics",
+      "created_at": "2025-01-02T00:00:00Z"
+    },
+    {
+      "id": "4",
+      "email": "parent.doe@example.com",
+      "role": "parent",
+      "name": "Jane Doe",
+      "children": ["7", "8"],
+      "created_at": "2025-01-03T00:00:00Z"
+    },
+    {
+      "id": "5",
+      "email": "parent.brown@example.com",
+      "role": "parent",
+      "name": "Robert Brown",
+      "children": ["9"],
+      "created_at": "2025-01-04T00:00:00Z"
+    },
+    {
+      "id": "6",
+      "email": "orientation@example.com",
+      "role": "orientation",
+      "name": "Emily Wilson",
+      "created_at": "2025-01-05T00:00:00Z"
+    },
+    {
+      "id": "7",
+      "email": "student1@example.com",
+      "role": "student",
+      "name": "Alice Doe",
+      "grade_level": "10",
+      "created_at": "2025-01-06T00:00:00Z"
+    },
+    {
+      "id": "8",
+      "email": "student2@example.com",
+      "role": "student",
+      "name": "Bob Doe",
+      "grade_level": "8",
+      "created_at": "2025-01-06T00:00:00Z"
+    },
+    {
+      "id": "9",
+      "email": "student3@example.com",
+      "role": "student",
+      "name": "Charlie Brown",
+      "grade_level": "9",
+      "created_at": "2025-01-07T00:00:00Z"
+    }
+  ]
+}

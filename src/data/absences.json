@@ -1,0 +1,48 @@
+{
+  "absences": [
+    {
+      "id": "1",
+      "student_id": "7",
+      "class_id": "1",
+      "date": "2025-06-01",
+      "reason": "Medical appointment",
+      "status": "approved",
+      "submitted_by": "4",
+      "submitted_at": "2025-06-01T08:00:00Z",
+      "document_provided": true
+    },
+    {
+      "id": "2",
+      "student_id": "8",
+      "class_id": "3",
+      "date": "2025-06-02",
+      "reason": "Family emergency",
+      "status": "pending",
+      "submitted_by": "4",
+      "submitted_at": "2025-06-02T07:30:00Z",
+      "document_provided": false
+    },
+    {
+      "id": "3",
+      "student_id": "9",
+      "class_id": "2",
+      "date": "2025-06-03",
+      "reason": "Sports competition",
+      "status": "approved",
+      "submitted_by": "5",
+      "submitted_at": "2025-06-01T09:00:00Z",
+      "document_provided": true
+    },
+    {
+      "id": "4",
+      "student_id": "7",
+      "class_id": "2",
+      "date": "2025-06-05",
+      "reason": "Late arrival",
+      "status": "pending",
+      "submitted_by": "4",
+      "submitted_at": "2025-06-05T09:15:00Z",
+      "document_provided": false
+    }
+  ]
+}

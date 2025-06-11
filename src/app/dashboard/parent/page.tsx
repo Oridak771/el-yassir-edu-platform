@@ -1,106 +1,154 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
+import React from 'react';
+import { getData } from '@/lib/data';
+import { User } from '@/lib/utils';
 import NotificationBell from '@/components/NotificationBell';
 import CalendarView from '@/components/CalendarView';
 import Chart from '@/components/Chart';
 import PDFGenerator from '@/components/PDFGenerator';
 import FileUploader from '@/components/FileUploader';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 
 export default function ParentDashboard() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [absences] = useState([
-    { date: '2025-05-01', reason: 'Sick', justified: false },
-    { date: '2025-05-03', reason: 'Late', justified: true }
-  ]);
-  const [grades] = useState([
-    { subject: 'Math', score: 15, total: 20 },
-    { subject: 'Science', score: 18, total: 20 }
-  ]);
-  const examEvents = [
-    { id: '1', title: 'Math Exam', start: '2025-06-01', end: '2025-06-01', event_type: 'exam' },
-    { id: '2', title: 'Science Exam', start: '2025-06-10', end: '2025-06-10', event_type: 'exam' }
-  ];
-  const pdfFields = [
-    { name: 'Student', value: '[Child Name]', x: 50, y: 700 },
-    { name: 'Period', value: '2024-2025', x: 400, y: 700 },
-    { name: 'Grades', value: 'Math: 15/20, Science: 18/20', x: 50, y: 650 }
-  ];
+  const user = getData.getUsersByRole('parent')[0];
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) setUser(session.user);
-      setLoading(false);
-    };
-    fetchUser();
-  }, []);
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Card>
+          <CardContent>
+            <p className="text-red-500">No parent user found in the system.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <div>Please log in.</div>;
+  // Get the classes where this parent's children are enrolled
+  const studentIds = getData.users()
+    .filter(u => u.role === 'student')
+    .map(u => u.id)
+    .slice(0, 2); // For testing, assume first two students are this parent's children
+
+  const absences = getData.absences()
+    .filter(a => studentIds.includes(a.student_id))
+    .slice(0, 5);
+
+  const grades = getData.grades()
+    .filter(g => studentIds.includes(g.student_id))
+    .map(g => ({
+      subject: getData.getClassById(g.class_id)?.name || 'Unknown',
+      score: g.grade,
+      total: 100,
+      term: g.term
+    }));
+
+  // PDF fields for bulletin
+  const pdfFields = grades.map((grade, index) => ({
+    name: grade.subject,
+    label: grade.subject,
+    value: `${grade.score}/${grade.total} (${grade.term})`,
+    x: 50,
+    y: 100 + (index * 30) // Position each grade 30 units below the previous one
+  }));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Parent Dashboard</h1>
+        <h1 className="text-2xl font-bold">Welcome, {user.name}</h1>
         <NotificationBell userId={user.id} />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Absences</CardTitle>
+            <CardDescription>Latest absence records for your children</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-4">
+              {absences.map((absence) => (
+                <li key={absence.id} className="p-4 border rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold">
+                        {getData.getUserById(absence.student_id)?.name}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {getData.getClassById(absence.class_id)?.name}
+                      </p>
+                    </div>
+                    <span className={`text-sm px-2 py-1 rounded ${
+                      absence.status === 'approved' ? 'bg-green-100 text-green-800' :
+                      absence.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {absence.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Date: {new Date(absence.date).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Reason: {absence.reason}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Latest Grades</CardTitle>
+            <CardDescription>Recent academic performance</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-4">
+              {grades.map((grade, index) => (
+                <li key={index} className="p-4 border rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold">{grade.subject}</p>
+                      <p className="text-sm text-gray-500">{grade.term}</p>
+                    </div>
+                    <span className={`text-lg font-semibold ${
+                      grade.score >= 75 ? 'text-green-600' :
+                      grade.score >= 60 ? 'text-yellow-600' :
+                      'text-red-600'
+                    }`}>
+                      {grade.score}%
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Child Absence Alerts</CardTitle>
+          <CardTitle>Academic Calendar</CardTitle>
+          <CardDescription>Upcoming exams and important dates</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2">
-            {absences.map((a, i) => (
-              <li key={i} className="flex gap-4 items-center">
-                <span>{a.date}</span>
-                <span>{a.reason}</span>
-                <span className={a.justified ? 'text-green-600' : 'text-red-600'}>
-                  {a.justified ? 'Justified' : 'Unjustified'}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <div className="h-[400px]">
+            <CalendarView userRole="parent" userId={user.id} events={[]} />
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Exam Schedule</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CalendarView userRole="parent" userId={user.id} eventTypes={['exam']} sampleEvents={examEvents} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Grades</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Chart
-            title="Grades"
-            type="bar"
-            data={grades}
-            xKey="subject"
-            dataKey="score"
-          />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>PDF Bulletin</CardTitle>
+          <CardTitle>Grade Report</CardTitle>
+          <CardDescription>Download your child's grade report</CardDescription>
         </CardHeader>
         <CardContent>
           <PDFGenerator
-            title="PDF Bulletin"
-            filename="bulletin.pdf"
+            title="Grade Report"
+            filename="grade_report.pdf"
             fields={pdfFields}
           />
         </CardContent>
@@ -108,10 +156,16 @@ export default function ParentDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Exam Correction Request (Upload Scan)</CardTitle>
+          <CardTitle>Exam Correction Request</CardTitle>
+          <CardDescription>Upload scanned exam correction request</CardDescription>
         </CardHeader>
         <CardContent>
-          <FileUploader userId={user.id} folder="exam_corrections" bucket="documents" documentType="exam_correction" />
+          <FileUploader 
+            userId={user.id} 
+            folder="exam_corrections" 
+            bucket="documents" 
+            documentType="exam_correction" 
+          />
         </CardContent>
       </Card>
     </div>

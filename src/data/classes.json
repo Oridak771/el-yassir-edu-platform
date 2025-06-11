@@ -1,0 +1,37 @@
+{
+  "classes": [
+    {
+      "id": "1",
+      "name": "Mathematics",
+      "professor_id": "2",
+      "students": ["7", "8", "9"],
+      "schedule": "Monday, Wednesday 9:00 AM",
+      "room": "201",
+      "semester": "Spring 2025",
+      "max_students": 30,
+      "current_students": 3
+    },
+    {
+      "id": "2",
+      "name": "Physics",
+      "professor_id": "3",
+      "students": ["7", "9"],
+      "schedule": "Tuesday, Thursday 10:00 AM",
+      "room": "301",
+      "semester": "Spring 2025",
+      "max_students": 25,
+      "current_students": 2
+    },
+    {
+      "id": "3",
+      "name": "Science",
+      "professor_id": "2",
+      "students": ["8"],
+      "schedule": "Monday, Friday 11:00 AM",
+      "room": "202",
+      "semester": "Spring 2025",
+      "max_students": 25,
+      "current_students": 1
+    }
+  ]
+}

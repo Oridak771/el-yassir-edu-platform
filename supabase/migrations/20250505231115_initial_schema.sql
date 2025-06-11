@@ -1,7 +1,7 @@
 -- Schema for Education Administration Platform
 
 -- Enable Row Level Security
---ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
+--ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';"
 --ALTER DATABASE postgres SET "app.jwt_exp" TO 3600;
 
 -- Users table with role-based access
@@ -178,28 +178,45 @@ CREATE TABLE IF NOT EXISTS payments (
 -- Users table policies
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- Helper function to get user role (SECURITY DEFINER to avoid RLS recursion)
-CREATE OR REPLACE FUNCTION get_user_role(user_id_to_check UUID)
-RETURNS TEXT
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = public -- IMPORTANT: Set search_path to prevent hijacking and ensure 'users' table is found
-AS $$
-  SELECT role::TEXT FROM users WHERE id = user_id_to_check;
-$$;
-
-GRANT EXECUTE ON FUNCTION get_user_role(UUID) TO authenticated;
+-- Removing the get_user_role function entirely. Policies will use subqueries.
+-- DROP FUNCTION IF EXISTS get_user_role(UUID); -- Optional: Add explicit drop if needed for clean rollback/re-application
 
 DROP POLICY IF EXISTS users_select_policy ON users;
 CREATE POLICY users_select_policy ON users
   FOR SELECT USING (
     -- Allow any authenticated user to select their own record
     auth.uid() = users.id
-    -- OR if the current authenticated user's role is 'admin' or 'orientation'
-    OR get_user_role(auth.uid()) IN ('admin', 'orientation')
+    -- OR if the current authenticated user's role is 'admin' or 'orientation' (checked via subquery)
+    OR EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role IN ('admin', 'orientation'))
     -- (Optional but good practice: Allow parents to see their linked children - assuming parent_id is in metadata)
-    -- OR auth.uid() IN (SELECT id FROM users WHERE role = 'parent' AND users.metadata->>'parent_id' = auth.uid()::text)
+    -- OR EXISTS (SELECT 1 FROM users p JOIN users c ON c.metadata->>'parent_id' = p.id::text WHERE p.id = auth.uid() AND p.role = 'parent' AND c.id = users.id)
   );
+
+-- Allow users to insert their own profile row
+DROP POLICY IF EXISTS users_insert_own_policy ON users;
+CREATE POLICY users_insert_own_policy ON users
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+-- Allow users to update their own profile (excluding role changes via this policy)
+DROP POLICY IF EXISTS users_update_own_record_policy ON users;
+CREATE POLICY users_update_own_record_policy ON users
+  FOR UPDATE
+  USING (auth.uid() = id); -- User can only target their own row for update.
+  -- Note: Removed WITH CHECK entirely to avoid potential conflicts. Application logic should prevent role/id changes.
+
+-- Allow admins to update any user profile
+DROP POLICY IF EXISTS users_admin_update_any_record_policy ON users;
+CREATE POLICY users_admin_update_any_record_policy ON users
+  FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')) -- Check role via subquery
+  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')); -- Check role via subquery
+
+-- Allow admins to delete users
+DROP POLICY IF EXISTS users_admin_delete_policy ON users;
+CREATE POLICY users_admin_delete_policy ON users
+  FOR DELETE
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')); -- Check role via subquery
 
 -- Classes table policies
 ALTER TABLE classes ENABLE ROW LEVEL SECURITY;

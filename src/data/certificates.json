@@ -1,0 +1,20 @@
+{
+  "certificates": [
+    {
+      "id": "1",
+      "student_id": "4",
+      "type": "enrollment",
+      "status": "issued",
+      "issue_date": "2025-05-01",
+      "expiry_date": "2026-05-01"
+    },
+    {
+      "id": "2",
+      "student_id": "5",
+      "type": "completion",
+      "status": "pending",
+      "issue_date": null,
+      "expiry_date": null
+    }
+  ]
+}

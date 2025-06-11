@@ -9,56 +9,27 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { supabase, getNotifications, markNotificationAsRead, subscribeToNotifications } from '@/lib/supabase';
-
-type Notification = {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  read: boolean;
-  link?: string;
-  created_at: string;
-};
+import { getData } from '@/lib/data';
+import { Notification } from '@/lib/utils';
 
 export default function NotificationBell({ userId }: { userId: string }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    // Fetch notifications on component mount
-    const fetchNotifications = async () => {
-      const notificationsData = await getNotifications(userId);
-      setNotifications(notificationsData);
-    };
-
-    fetchNotifications();
-
-    // Subscribe to new notifications
-    const subscription = subscribeToNotifications(userId, (payload) => {
-      const newNotification = payload.new as Notification;
-      setNotifications(prev => [newNotification, ...prev]);
-    });
-
-    return () => {
-      // Unsubscribe when component unmounts
-      subscription.then(sub => sub.unsubscribe());
-    };
+    // Get notifications from static data
+    const userNotifications = getData.getUserNotifications(userId);
+    setNotifications(userNotifications);
   }, [userId]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.read && !readNotifications.has(n.id)).length;
 
   const handleNotificationClick = async (notificationId: string, link?: string) => {
-    await markNotificationAsRead(notificationId);
-    
-    // Update the local state to mark the notification as read
-    setNotifications(notifications.map(notification => 
-      notification.id === notificationId 
-        ? { ...notification, read: true } 
-        : notification
-    ));
+    // Mark notification as read in local state
+    setReadNotifications(prev => new Set([...prev, notificationId]));
 
-    // Navigate to the link if provided
+    // Navigate to link if provided
     if (link) {
       window.location.href = link;
     }
@@ -83,7 +54,11 @@ export default function NotificationBell({ userId }: { userId: string }) {
             notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
-                className={`p-3 border-b cursor-pointer ${notification.read ? 'bg-gray-50' : 'bg-blue-50'}`}
+                className={`p-3 border-b cursor-pointer ${
+                  notification.read || readNotifications.has(notification.id) 
+                    ? 'bg-gray-50' 
+                    : 'bg-blue-50'
+                }`}
                 onClick={() => handleNotificationClick(notification.id, notification.link)}
               >
                 <div>
