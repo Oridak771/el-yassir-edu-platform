@@ -11,12 +11,12 @@ import {
   DialogDescription, 
   DialogFooter 
 } from '@/components/ui/dialog';
-import { supabase } from '@/lib/supabase';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg, EventContentArg } from '@fullcalendar/core';
+import { supabase } from '@/lib/supabase';
 
 interface Event {
   id: string;
@@ -72,9 +72,7 @@ export default function CalendarView({
         .eq('user_id', userId);
 
       const { data, error } = await query;
-
       if (error) throw error;
-
       const formattedEvents: Event[] = data.map((event: any) => ({
         id: event.id || crypto.randomUUID(),
         title: event.title || '',
@@ -85,7 +83,6 @@ export default function CalendarView({
         event_type: event.event_type,
         location: event.location
       }));
-
       setEvents(formattedEvents);
     } catch (error) {
       console.error('Error fetching events:', error);

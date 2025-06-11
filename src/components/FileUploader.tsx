@@ -74,43 +74,24 @@ export default function FileUploader({
       const filePath = `${folder}/${fileName}`;
 
       // Upload file to Supabase Storage
-      const { data, error } = await supabase.storage
+      const { data, error: uploadError } = await supabase
+        .storage
         .from(bucket)
         .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
+          contentType: file.type,
+          upsert: true
         });
 
-      if (error) throw error;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
-      // Record in documents table
-      const { error: docError } = await supabase
-        .from('documents')
-        .insert({
-          name: file.name,
-          type: documentType,
-          url: publicUrl,
-          owner_id: userId,
-          metadata: {
-            size: file.size,
-            contentType: file.type,
-            originalName: file.name
-          }
-        });
-
-      if (docError) throw docError;
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
 
       setUploadSuccess(true);
       setFile(null);
       setUploadProgress(100);
 
       if (onUploadComplete) {
-        onUploadComplete(publicUrl, {
+        onUploadComplete('', {
           size: file.size,
           contentType: file.type,
           originalName: file.name,
