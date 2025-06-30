@@ -1,0 +1,44 @@
+{
+  "grades": [
+    {
+      "id": "1",
+      "student_id": "7",
+      "class_id": "1",
+      "grade": 12,
+      "term": "Q2",
+      "date": "2025-06-01",
+      "type": "Exam",
+      "comment": "Good understanding of calculus concepts"
+    },
+    {
+      "id": "2",
+      "student_id": "7",
+      "class_id": "2",
+      "grade": 15,
+      "term": "Q2",
+      "date": "2025-06-02",
+      "type": "Quiz",
+      "comment": "Needs improvement in problem-solving"
+    },
+    {
+      "id": "3",
+      "student_id": "8",
+      "class_id": "1",
+      "grade": 7,
+      "term": "Q2",
+      "date": "2025-06-01",
+      "type": "Exam",
+      "comment": "Excellent work!"
+    },
+    {
+      "id": "4",
+      "student_id": "9",
+      "class_id": "2",
+      "grade": 18,
+      "term": "Q2",
+      "date": "2025-06-02",
+      "type": "Quiz",
+      "comment": "Shows great potential"
+    }
+  ]
+}
