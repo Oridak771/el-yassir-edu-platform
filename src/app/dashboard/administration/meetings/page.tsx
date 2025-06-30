@@ -195,13 +195,13 @@ export default function AdminMeetingsPage() {
             <CardTitle>Upcoming Meetings & Calls</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
+            {loading || !currentUser ? (
               <p>Loading schedule...</p>
             ) : (
               <div className="h-[500px]">
                 <CalendarView
                   userRole="admin"
-                  userId={currentUser?.id || ''}
+                  userId={String(currentUser.id)}
                   eventTypes={['meeting', 'call']}
                   sampleEvents={meetings}
                   initialView="timeGridWeek"

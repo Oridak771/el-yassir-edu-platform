@@ -94,6 +94,7 @@ export default function AdministrationDashboard() {
             data={teacherStats}
             xKey="className"
             dataKey="teachers"
+            width="100%"
           />
         </CardContent>
       </Card>

@@ -33,14 +33,16 @@ type ClassInfoWithSchedule = {
 };
 
 // Type matching the 'Event' type expected by CalendarView
+// Fix: description and location must be string | undefined, not null
+// Remove '| null' from the type
 type CalendarViewEvent = {
     id: string;
     title: string;
     start: string; // ISO string or Date object
     end: string; // ISO string or Date object
     event_type: string; // Required by CalendarView's Event type
-    description?: string | null;
-    location?: string | null;
+    description?: string; // Fix: no null
+    location?: string; // Fix: no null
     allDay?: boolean;
     // Add other FullCalendar props like resourceId, color etc. if needed
 };
@@ -65,14 +67,14 @@ export default function AdminTimetablesPage() {
       if (eventsError) {
         console.error("Error fetching general events:", eventsError);
       } else if (dbEventsData) {
-        const formattedDbEvents = dbEventsData.map((event: DbEvent): CalendarViewEvent => ({ // Ensure return type matches
+        const formattedDbEvents = dbEventsData.map((event: DbEvent): CalendarViewEvent => ({
           id: `event-${event.id}`,
           title: event.title,
           start: event.start_time,
           end: event.end_time,
           allDay: !event.start_time.includes('T'), // Basic check if it's an all-day event
           event_type: event.event_type, // Add the required event_type
-          description: event.description ?? undefined, // Ensure undefined instead of null
+          description: event.description ?? undefined, // Fix: never null
           location: event.location ?? undefined, // Ensure undefined instead of null
         }));
         combinedEvents = combinedEvents.concat(formattedDbEvents);
@@ -123,6 +125,7 @@ export default function AdminTimetablesPage() {
             <div className="h-[500px]">
               <CalendarView
                 userRole="admin"
+                userId="admin-dashboard"
                 sampleEvents={calendarEvents}
                 initialView="timeGridWeek"
               />

@@ -28,7 +28,7 @@ type ChartProps = {
   valueKey?: string;
   colors?: string[];
   height?: number;
-  width?: number;
+  width?: number | string; // Allow both number and string for width
   stacked?: boolean;
 };
 
@@ -43,14 +43,17 @@ export default function Chart({
   valueKey = 'value',
   colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28'],
   height = 300,
-  width = '100%',
+  width = '100%', // This is now valid
   stacked = false
 }: ChartProps) {
+  // Ensure width is always defined and valid for ResponsiveContainer
+  const containerWidth = width ?? '100%';
+
   const renderContent = () => {
     switch (type) {
       case 'bar':
         return (
-          <ResponsiveContainer width={width} height={height}>
+          <ResponsiveContainer width={containerWidth} height={height}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={xKey} />
@@ -66,9 +69,9 @@ export default function Chart({
                     stackId={stacked ? "a" : undefined}
                   />
                 ))
-              ) : (
+              ) : dataKey ? (
                 <Bar dataKey={dataKey} fill={colors[0]} />
-              )}
+              ) : null}
             </BarChart>
           </ResponsiveContainer>
         );

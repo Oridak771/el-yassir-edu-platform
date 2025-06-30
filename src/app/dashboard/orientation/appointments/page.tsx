@@ -232,7 +232,7 @@ export default function OrientationAppointmentsPage() {
             <div className="h-[600px]"> {/* Give calendar a defined height */}
                 <CalendarView
                     userRole="orientation"
-                    userId={currentUser?.id} // Pass supervisor's ID
+                    userId={String(currentUser?.id ?? '')} // Always a string, never undefined
                     eventTypes={['parent_appointment']} // Filter for these types
                     sampleEvents={appointments} // Pass fetched appointments
                     initialView="timeGridWeek"
