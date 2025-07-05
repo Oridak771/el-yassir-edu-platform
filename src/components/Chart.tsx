@@ -28,7 +28,11 @@ type ChartProps = {
   valueKey?: string;
   colors?: string[];
   height?: number;
+<<<<<<< HEAD
   width?: number | string; // Allow both number and string for width
+=======
+  width?: number;
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   stacked?: boolean;
 };
 
@@ -43,17 +47,27 @@ export default function Chart({
   valueKey = 'value',
   colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28'],
   height = 300,
+<<<<<<< HEAD
   width = '100%', // This is now valid
   stacked = false
 }: ChartProps) {
   // Ensure width is always defined and valid for ResponsiveContainer
   const containerWidth = width ?? '100%';
 
+=======
+  width = '100%',
+  stacked = false
+}: ChartProps) {
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   const renderContent = () => {
     switch (type) {
       case 'bar':
         return (
+<<<<<<< HEAD
           <ResponsiveContainer width={containerWidth} height={height}>
+=======
+          <ResponsiveContainer width={width} height={height}>
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={xKey} />
@@ -69,9 +83,15 @@ export default function Chart({
                     stackId={stacked ? "a" : undefined}
                   />
                 ))
+<<<<<<< HEAD
               ) : dataKey ? (
                 <Bar dataKey={dataKey} fill={colors[0]} />
               ) : null}
+=======
+              ) : (
+                <Bar dataKey={dataKey} fill={colors[0]} />
+              )}
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
             </BarChart>
           </ResponsiveContainer>
         );

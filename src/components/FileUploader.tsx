@@ -74,6 +74,7 @@ export default function FileUploader({
       const filePath = `${folder}/${fileName}`;
 
       // Upload file to Supabase Storage
+<<<<<<< HEAD
       const { data, error } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
@@ -104,13 +105,30 @@ export default function FileUploader({
         });
 
       if (docError) throw docError;
+=======
+      const { data, error: uploadError } = await supabase
+        .storage
+        .from(bucket)
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: true
+        });
+
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
       setUploadSuccess(true);
       setFile(null);
       setUploadProgress(100);
 
       if (onUploadComplete) {
+<<<<<<< HEAD
         onUploadComplete(publicUrl, {
+=======
+        onUploadComplete('', {
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
           size: file.size,
           contentType: file.type,
           originalName: file.name,

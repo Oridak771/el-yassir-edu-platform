@@ -98,6 +98,7 @@
     "read": false,
     "link": "/dashboard/professor/grades",
     "created_at": "2025-05-29T14:20:00Z"
+<<<<<<< HEAD
   },
    {
     "id": "4",
@@ -108,5 +109,7 @@
     "read": false,
     "link": "/dashboard/orientation/meetings",
     "created_at": "2025-06-04T16:45:00Z"
+=======
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   }
 ]

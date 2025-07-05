@@ -67,14 +67,14 @@ export default function AdminTimetablesPage() {
       if (eventsError) {
         console.error("Error fetching general events:", eventsError);
       } else if (dbEventsData) {
-        const formattedDbEvents = dbEventsData.map((event: DbEvent): CalendarViewEvent => ({
+        const formattedDbEvents = dbEventsData.map((event: DbEvent): CalendarViewEvent => ({ // Ensure return type matches
           id: `event-${event.id}`,
           title: event.title,
           start: event.start_time,
           end: event.end_time,
           allDay: !event.start_time.includes('T'), // Basic check if it's an all-day event
           event_type: event.event_type, // Add the required event_type
-          description: event.description ?? undefined, // Fix: never null
+          description: event.description ?? undefined, // Ensure undefined instead of null
           location: event.location ?? undefined, // Ensure undefined instead of null
         }));
         combinedEvents = combinedEvents.concat(formattedDbEvents);
@@ -147,7 +147,6 @@ export default function AdminTimetablesPage() {
           <Button className="mt-4">Add New Schedule/Event (Placeholder)</Button>
         </CardContent>
       </Card>
-
     </div>
   </div>
   );
