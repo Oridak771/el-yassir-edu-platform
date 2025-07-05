@@ -33,14 +33,16 @@ type ClassInfoWithSchedule = {
 };
 
 // Type matching the 'Event' type expected by CalendarView
+// Fix: description and location must be string | undefined, not null
+// Remove '| null' from the type
 type CalendarViewEvent = {
     id: string;
     title: string;
     start: string; // ISO string or Date object
     end: string; // ISO string or Date object
     event_type: string; // Required by CalendarView's Event type
-    description?: string | null;
-    location?: string | null;
+    description?: string; // Fix: no null
+    location?: string; // Fix: no null
     allDay?: boolean;
     // Add other FullCalendar props like resourceId, color etc. if needed
 };
@@ -106,10 +108,10 @@ export default function AdminTimetablesPage() {
 
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Timetables & Schedules</h1>
-
-      <Card>
+  <div className="space-y-6">
+    <h1 className="text-3xl font-bold">Timetables & Schedules</h1>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card className="lg:col-span-1">
         <CardHeader>
           <CardTitle>Master Schedule View</CardTitle>
         </CardHeader>
@@ -120,26 +122,24 @@ export default function AdminTimetablesPage() {
           {loading ? (
             <p>Loading schedule...</p>
           ) : (
-            <div className="h-[600px]"> {/* Give calendar a defined height */}
-                <CalendarView
-                    userRole="admin" // Pass admin role
-                    // userId needed by CalendarView? Check its props if error occurs
-                    // eventTypes={[]} // Let CalendarView fetch based on role or pass specific types
-                    sampleEvents={calendarEvents} // Pass the combined events (now matching Event type)
-                    initialView="timeGridWeek" // Default to week view
-                />
+            <div className="h-[500px]">
+              <CalendarView
+                userRole="admin"
+                userId="admin-dashboard"
+                sampleEvents={calendarEvents}
+                initialView="timeGridWeek"
+              />
             </div>
           )}
         </CardContent>
       </Card>
-
-      <Card>
+      <Card className="lg:col-span-1">
         <CardHeader>
           <CardTitle>Manage Schedules</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Placeholder for tools to:</p>
-          <ul className="list-disc pl-5 space-y-1 mt-2 text-sm">
+          <p>Tools to manage your schedules:</p>
+          <ul className="list-disc pl-5 space-y-2 mt-4 text-sm">
             <li>Create/Edit Class Timetables (Potentially via direct JSON editing or a dedicated UI)</li>
             <li>Schedule General Events (Exams, Meetings, Training etc. - likely via 'events' table)</li>
             {/* Add more management actions */}
@@ -147,7 +147,7 @@ export default function AdminTimetablesPage() {
           <Button className="mt-4">Add New Schedule/Event (Placeholder)</Button>
         </CardContent>
       </Card>
-
     </div>
+  </div>
   );
 }

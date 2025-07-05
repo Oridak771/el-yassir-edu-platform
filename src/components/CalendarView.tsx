@@ -11,12 +11,19 @@ import {
   DialogDescription, 
   DialogFooter 
 } from '@/components/ui/dialog';
+<<<<<<< HEAD
+import { supabase } from '@/lib/supabase';
+=======
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg, EventContentArg } from '@fullcalendar/core';
+<<<<<<< HEAD
+=======
 import { supabase } from '@/lib/supabase';
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
 interface Event {
   id: string;
@@ -72,7 +79,13 @@ export default function CalendarView({
         .eq('user_id', userId);
 
       const { data, error } = await query;
+<<<<<<< HEAD
+
       if (error) throw error;
+
+=======
+      if (error) throw error;
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
       const formattedEvents: Event[] = data.map((event: any) => ({
         id: event.id || crypto.randomUUID(),
         title: event.title || '',
@@ -83,6 +96,10 @@ export default function CalendarView({
         event_type: event.event_type,
         location: event.location
       }));
+<<<<<<< HEAD
+
+=======
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
       setEvents(formattedEvents);
     } catch (error) {
       console.error('Error fetching events:', error);

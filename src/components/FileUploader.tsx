@@ -74,6 +74,38 @@ export default function FileUploader({
       const filePath = `${folder}/${fileName}`;
 
       // Upload file to Supabase Storage
+<<<<<<< HEAD
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      // Record in documents table
+      const { error: docError } = await supabase
+        .from('documents')
+        .insert({
+          name: file.name,
+          type: documentType,
+          url: publicUrl,
+          owner_id: userId,
+          metadata: {
+            size: file.size,
+            contentType: file.type,
+            originalName: file.name
+          }
+        });
+
+      if (docError) throw docError;
+=======
       const { data, error: uploadError } = await supabase
         .storage
         .from(bucket)
@@ -85,13 +117,18 @@ export default function FileUploader({
       if (uploadError) {
         throw new Error(uploadError.message);
       }
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
       setUploadSuccess(true);
       setFile(null);
       setUploadProgress(100);
 
       if (onUploadComplete) {
+<<<<<<< HEAD
+        onUploadComplete(publicUrl, {
+=======
         onUploadComplete('', {
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
           size: file.size,
           contentType: file.type,
           originalName: file.name,

@@ -6,11 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea'; // Added for notes
+<<<<<<< HEAD
+import { supabase, getUserProfile } from '@/lib/supabase'; // Assuming getUserProfile fetches from public.users
+import { User } from '@supabase/supabase-js'; // For Supabase auth user type
+import { Badge } from '@/components/ui/badge'; // For request status
+=======
 import { supabase, getUserProfile } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { Badge } from '@/components/ui/badge';
 
 // Restore all Supabase auth, profile, and settings logic as before
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
 type UserProfile = {
     id: string;
@@ -65,6 +71,10 @@ export default function SettingsPage() {
     setMessage(null);
     const { data: { user } } = await supabase.auth.getUser();
     setAuthUser(user);
+<<<<<<< HEAD
+
+=======
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
     if (user) {
       const profile = await getUserProfile(user.id) as UserProfile | null;
       setUserProfile(profile);
@@ -86,7 +96,11 @@ export default function SettingsPage() {
       }
     }
     setLoading(false);
+<<<<<<< HEAD
+  }, []); // Removed fetchChildLinkRequests from here, will be called separately
+=======
   }, []);
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
   const fetchChildLinkRequests = async (parentId: string) => {
       const { data, error } = await supabase
@@ -113,12 +127,29 @@ export default function SettingsPage() {
     setIsSubmittingName(true);
     setMessage(null);
 
+<<<<<<< HEAD
+    const { error } = await supabase
+      .from('users')
+      .update({ full_name: fullName })
+      .eq('id', authUser.id);
+
+    if (error) {
+      console.error("Error updating name:", error);
+      setMessage({ type: 'error', text: `Failed to update name: ${error.message}` });
+    } else {
+      setMessage({ type: 'success', text: 'Full name updated successfully!' });
+      const updatedProfile = await getUserProfile(authUser.id) as UserProfile | null;
+      setUserProfile(updatedProfile);
+    }
+    setIsSubmittingName(false);
+=======
     // Mock update name
     setTimeout(() => {
       setUserProfile(prev => prev ? { ...prev, full_name: fullName } : null);
       setMessage({ type: 'success', text: 'Full name updated successfully!' });
       setIsSubmittingName(false);
     }, 1000);
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -139,6 +170,19 @@ export default function SettingsPage() {
     setIsSubmittingPassword(true);
     setMessage(null);
 
+<<<<<<< HEAD
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      console.error("Error changing password:", error);
+      setMessage({ type: 'error', text: `Failed to change password: ${error.message}` });
+    } else {
+      setMessage({ type: 'success', text: 'Password changed successfully!' });
+      setNewPassword('');
+      setConfirmNewPassword('');
+    }
+    setIsSubmittingPassword(false);
+=======
     // Mock change password
     setTimeout(() => {
       setMessage({ type: 'success', text: 'Password changed successfully!' });
@@ -146,6 +190,7 @@ export default function SettingsPage() {
       setConfirmNewPassword('');
       setIsSubmittingPassword(false);
     }, 1000);
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   };
 
   const handleRequestChildLink = async (e: React.FormEvent) => {
@@ -158,6 +203,29 @@ export default function SettingsPage() {
     setIsSubmittingLinkRequest(true);
     setMessage(null);
 
+<<<<<<< HEAD
+    const { error } = await supabase
+        .from('child_link_requests')
+        .insert({
+            parent_id: authUser.id,
+            child_email: newLinkChildEmail,
+            child_full_name: newLinkChildName.trim() || null,
+            request_notes: newLinkNotes.trim() || null,
+            status: 'pending'
+        });
+
+    if (error) {
+        console.error("Error submitting child link request:", error);
+        setMessage({ type: 'error', text: `Failed to submit request: ${error.message}` });
+    } else {
+        setMessage({ type: 'success', text: 'Child link request submitted successfully. Awaiting admin approval.' });
+        setNewLinkChildEmail('');
+        setNewLinkChildName('');
+        setNewLinkNotes('');
+        fetchChildLinkRequests(authUser.id); // Refresh requests list
+    }
+    setIsSubmittingLinkRequest(false);
+=======
     // Mock submit child link request
     setTimeout(() => {
       setMessage({ type: 'success', text: 'Child link request submitted successfully. Awaiting admin approval.' });
@@ -167,6 +235,7 @@ export default function SettingsPage() {
       fetchChildLinkRequests(authUser.id); // Refresh requests list
       setIsSubmittingLinkRequest(false);
     }, 1000);
+>>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   };
 
   const getStatusBadgeVariant = (status: string): "default" | "destructive" | "outline" | "secondary" | null | undefined => {

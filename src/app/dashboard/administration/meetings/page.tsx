@@ -37,17 +37,37 @@ type CalendarViewEvent = {
 };
 
 export default function AdminMeetingsPage() {
-  const [meetings, setMeetings] = useState<CalendarViewEvent[]>([]); // State to hold formatted events
+  const [meetings, setMeetings] = useState<CalendarViewEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateMeetingDialog, setShowCreateMeetingDialog] = useState(false);
-  // State for the new meeting form
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  // New meeting form state
   const [newMeetingTitle, setNewMeetingTitle] = useState('');
   const [newMeetingDescription, setNewMeetingDescription] = useState('');
-  const [newMeetingStartTime, setNewMeetingStartTime] = useState(''); // Use datetime-local input
-  const [newMeetingEndTime, setNewMeetingEndTime] = useState(''); // Use datetime-local input
+  const [newMeetingStartTime, setNewMeetingStartTime] = useState('');
+  const [newMeetingEndTime, setNewMeetingEndTime] = useState('');
   const [newMeetingLocation, setNewMeetingLocation] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    // Get current session
+    const getCurrentUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUser(session?.user || null);
+    };
+    
+    getCurrentUser();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user || null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const fetchMeetings = useCallback(async () => {
     setLoading(true);
@@ -86,7 +106,7 @@ export default function AdminMeetingsPage() {
       setNewMeetingStartTime('');
       setNewMeetingEndTime('');
       setNewMeetingLocation('');
-      setShowCreateMeetingDialog(false);
+      setShowScheduleDialog(false);
   };
 
   const handleCreateMeeting = async () => {
@@ -129,11 +149,10 @@ export default function AdminMeetingsPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Meetings & Calls Management</h1>
-
-        <Dialog open={showCreateMeetingDialog} onOpenChange={setShowCreateMeetingDialog}>
+        <h1 className="text-3xl font-bold">Meetings & Calls</h1>
+        <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
           <DialogTrigger asChild>
-            <Button>Schedule New Meeting/Call</Button>
+            <Button onClick={() => setShowScheduleDialog(true)}>Schedule Meeting</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader><DialogTitle>Schedule New Meeting/Call</DialogTitle></DialogHeader>
@@ -168,40 +187,68 @@ export default function AdminMeetingsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Upcoming Meetings & Calls</CardTitle>
-        </CardHeader>
-        <CardContent>
-           {loading ? (
-            <p>Loading schedule...</p>
-          ) : (
-            <div className="h-[600px]"> {/* Give calendar a defined height */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Upcoming Meetings & Calls</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading || !currentUser ? (
+              <p>Loading schedule...</p>
+            ) : (
+              <div className="h-[500px]">
                 <CalendarView
-                    userRole="admin"
-                    // Pass userId if CalendarView requires it for fetching/filtering internally
-                    // userId={currentUser?.id}
-                    sampleEvents={meetings} // Pass fetched meetings (now matching Event type)
-                    initialView="timeGridWeek"
+                  userRole="admin"
+                  userId={String(currentUser.id)}
+                  eventTypes={['meeting', 'call']}
+                  sampleEvents={meetings}
+                  initialView="timeGridWeek"
                 />
-            </div>
-          )}
-          {/* TODO: Add a list view below or as an alternative to the calendar for meetings */}
-        </CardContent>
-      </Card>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Meeting History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Placeholder for a table or list of past meetings with details and minutes (if applicable).</p>
-          {/* Filter 'meetings' state for past events */}
-        </CardContent>
-      </Card>
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Meeting History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">View past meetings with details and minutes (if applicable).</p>
+              {loading ? (
+                <p>Loading meeting history...</p>
+              ) : meetings.filter(m => new Date(m.end) < new Date()).length === 0 ? (
+                <p>No past meetings found.</p>
+              ) : (
+                <div className="max-h-[500px] overflow-y-auto">
+                  <ul className="space-y-3">
+                    {meetings
+                      .filter(m => new Date(m.end) < new Date())
+                      .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+                      .map(meeting => (
+                        <li key={meeting.id} className="p-4 border rounded-lg">
+                          <h3 className="font-medium">{meeting.title}</h3>
+                          <p className="text-sm text-gray-500">
+                            {new Date(meeting.start).toLocaleString()} - {new Date(meeting.end).toLocaleString()}
+                          </p>
+                          {meeting.location && (
+                            <p className="text-sm text-gray-500">Location: {meeting.location}</p>
+                          )}
+                          {meeting.description && (
+                            <p className="text-sm mt-2">{meeting.description}</p>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

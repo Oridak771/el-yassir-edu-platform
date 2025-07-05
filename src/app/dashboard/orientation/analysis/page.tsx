@@ -190,7 +190,7 @@ export default function OrientationGradeAnalysisPage() {
           {!loading && chartData.length === 0 && <p>No data to display for the selected filters. Please select filters above.</p>}
           {!loading && chartData.length > 0 && (
             analysisType === 'class_histogram' ?
-              <Chart type="bar" data={chartData} xKey="name" dataKey="value" title="" /> :
+              <Chart type="bar" data={chartData} xKey="name" dataKey="value" title="" width="100%" /> :
             analysisType === 'module_average' || analysisType === 'level_average' ?
               // Display as text or simple bar for single value average
               <div className="text-2xl font-bold">{chartData[0].name}: {chartData[0].value}%</div> :
