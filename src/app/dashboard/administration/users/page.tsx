@@ -20,7 +20,15 @@ type UserProfile = {
 };
 
 export default function AdminUserManagementPage() {
-  const [users, setUsers] = useState<UserProfile[]>(usersData);
+  const [users, setUsers] = useState<UserProfile[]>(
+    usersData.users.map((u: any) => ({
+      id: u.id,
+      email: u.email,
+      full_name: u.name, // map 'name' to 'full_name'
+      role: u.role as UserProfile['role'],
+      created_at: u.created_at
+    }))
+  );
   const [showUserDialog, setShowUserDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState({ email: '', full_name: '', role: 'parent' });
@@ -100,7 +108,11 @@ export default function AdminUserManagementPage() {
               onSubmit={e => {
                 e.preventDefault();
                 if (editingUser) {
-                  setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...formData } : u));
+                  setUsers(prev => prev.map(u =>
+                    u.id === editingUser.id
+                      ? { ...u, ...formData, role: formData.role as UserProfile['role'] }
+                      : u
+                  ));
                   resetForm();
                 } else {
                   handleCreateUser();
