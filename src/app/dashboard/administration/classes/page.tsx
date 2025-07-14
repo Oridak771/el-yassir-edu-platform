@@ -85,7 +85,7 @@ export default function AdminClassesPage() {
         schedule: scheduleJson,
     };
 
-    let error;
+    let error: unknown;
     if (editingClass) {
         // Update existing class
         error = null; // Placeholder for update logic
@@ -96,7 +96,8 @@ export default function AdminClassesPage() {
 
     if (error) {
         console.error('Error saving class:', error);
-        alert(`Error saving class: ${error.message}`);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        alert(`Error saving class: ${errorMsg}`);
     } else {
         alert(`Class ${editingClass ? 'updated' : 'created'} successfully!`);
         resetForm();
