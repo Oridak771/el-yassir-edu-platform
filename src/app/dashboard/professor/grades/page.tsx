@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { getData } from '@/lib/data';
+import { getUsersByRole, getClassesByProfessor, getClassById, getUserById, getGrades } from '@/lib/data';
 import { Download, Save } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -27,10 +27,10 @@ export default function ProfessorGradesPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Get current professor
-  const professor = getData.getUsersByRole('professor')[0];
+  const professor = getUsersByRole('professor')[0];
   
   // Get professor's classes
-  const myClasses = getData.getClassesByProfessor(professor?.id || '');
+  const myClasses = getClassesByProfessor(professor?.id || '');
 
   useEffect(() => {
     if (selectedClassId) {
@@ -40,11 +40,11 @@ export default function ProfessorGradesPage() {
 
   const loadStudentGrades = () => {
     // Get all students in the selected class
-    const classData = getData.getClassById(selectedClassId);
+    const classData = getClassById(selectedClassId);
     if (classData) {
       const students = classData.students.map(studentId => {
-        const student = getData.getUserById(studentId);
-        const existingGrade = getData.grades().find(g => 
+        const student = getUserById(studentId);
+        const existingGrade = getGrades().find((g: any) => 
           g.student_id === studentId && 
           g.class_id === selectedClassId && 
           g.type === selectedGradeType

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import Chart from '@/components/Chart';
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 import PDFGenerator from '@/components/PDFGenerator';
 
 const gradesData = [
@@ -13,6 +14,18 @@ const gradesData = [
 
 export default function ParentGradesPage() {
   const [grades] = useState(gradesData);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
+  const chartData = gradesData.map(g => ({ name: g.subject, value: g.grade }));
+
+  const pdfFields = gradesData.map((grade, index) => ({
+    name: grade.subject,
+    label: `Grade for ${grade.subject}`,
+    value: `${grade.grade}%`,
+    x: 50,
+    y: 100 + (index * 20),
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -27,7 +40,7 @@ export default function ParentGradesPage() {
           ))}
         </ul>
         <Chart title="Grades Overview" type="bar" data={grades} xKey="subject" dataKey="grade" />
-        <PDFGenerator />
+        <PDFGenerator title="Grades Report" filename="grades.pdf" fields={pdfFields} />
       </CardContent>
     </Card>
   );

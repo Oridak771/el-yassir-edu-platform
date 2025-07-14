@@ -6,7 +6,7 @@ import { Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } fro
 import absencesData from '@/data/absences.json';
 
 export default function ParentAbsencesPage() {
-  const [absences] = useState(absencesData);
+  const [absences] = useState(absencesData.absences);
 
   return (
     <Card>

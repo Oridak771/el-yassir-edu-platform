@@ -1,17 +1,31 @@
 'use client';
 
 import React from 'react';
-import { getData } from '@/lib/data';
-import { User } from '@/lib/utils';
+import {
+  getUsersByRole,
+  getUsers,
+  getAbsences,
+  getGrades,
+  getClassById,
+  getUserById,
+} from '@/lib/data';
+import type { User, Absence, Grade } from '@/lib/definitions';
 import NotificationBell from '@/components/NotificationBell';
 import CalendarView from '@/components/CalendarView';
-import Chart from '@/components/Chart';
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 import PDFGenerator from '@/components/PDFGenerator';
 import FileUploader from '@/components/FileUploader';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from '@/components/ui/card';
 
 export default function ParentDashboard() {
-  const user = getData.getUsersByRole('parent')[0];
+  const user: User | undefined = getUsersByRole('parent')[0];
 
   if (!user) {
     return (
@@ -25,32 +39,30 @@ export default function ParentDashboard() {
     );
   }
 
-  // Get the classes where this parent's children are enrolled
-  const studentIds = getData.users()
-    .filter(u => u.role === 'student')
-    .map(u => u.id)
-    .slice(0, 2); // For testing, assume first two students are this parent's children
+  const studentIds: string[] = getUsers()
+    .filter((u: User) => u.role === 'student')
+    .map((u: User) => u.id)
+    .slice(0, 2);
 
-  const absences = getData.absences()
-    .filter(a => studentIds.includes(a.student_id))
+  const absences: Absence[] = getAbsences()
+    .filter((a: Absence) => studentIds.includes(a.student_id))
     .slice(0, 5);
 
-  const grades = getData.grades()
-    .filter(g => studentIds.includes(g.student_id))
-    .map(g => ({
-      subject: getData.getClassById(g.class_id)?.name || 'Unknown',
+  const grades = getGrades()
+    .filter((g: Grade) => studentIds.includes(g.student_id))
+    .map((g: Grade) => ({
+      subject: getClassById(g.class_id)?.name || 'Unknown',
       score: g.grade,
       total: 100,
-      term: g.term
+      term: g.term,
     }));
 
-  // PDF fields for bulletin
-  const pdfFields = grades.map((grade, index) => ({
+  const pdfFields = grades.map((grade, index: number) => ({
     name: grade.subject,
     label: grade.subject,
     value: `${grade.score}/${grade.total} (${grade.term})`,
     x: 50,
-    y: 100 + (index * 30) // Position each grade 30 units below the previous one
+    y: 100 + index * 30,
   }));
 
   return (
@@ -64,26 +76,32 @@ export default function ParentDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Recent Absences</CardTitle>
-            <CardDescription>Latest absence records for your children</CardDescription>
+            <CardDescription>
+              Latest absence records for your children
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              {absences.map((absence) => (
+              {absences.map((absence: Absence) => (
                 <li key={absence.id} className="p-4 border rounded-lg">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-semibold">
-                        {getData.getUserById(absence.student_id)?.name}
+                        {getUserById(absence.student_id)?.name}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {getData.getClassById(absence.class_id)?.name}
+                        {getClassById(absence.class_id)?.name}
                       </p>
                     </div>
-                    <span className={`text-sm px-2 py-1 rounded ${
-                      absence.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      absence.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`text-sm px-2 py-1 rounded ${
+                        absence.status === 'approved'
+                          ? 'bg-green-100 text-green-800'
+                          : absence.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
                       {absence.status}
                     </span>
                   </div>
@@ -106,18 +124,22 @@ export default function ParentDashboard() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              {grades.map((grade, index) => (
+              {grades.map((grade, index: number) => (
                 <li key={index} className="p-4 border rounded-lg">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-semibold">{grade.subject}</p>
                       <p className="text-sm text-gray-500">{grade.term}</p>
                     </div>
-                    <span className={`text-lg font-semibold ${
-                      grade.score >= 75 ? 'text-green-600' :
-                      grade.score >= 60 ? 'text-yellow-600' :
-                      'text-red-600'
-                    }`}>
+                    <span
+                      className={`text-lg font-semibold ${
+                        grade.score >= 75
+                          ? 'text-green-600'
+                          : grade.score >= 60
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                      }`}
+                    >
                       {grade.score}%
                     </span>
                   </div>
@@ -131,7 +153,9 @@ export default function ParentDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Academic Calendar</CardTitle>
-          <CardDescription>Upcoming exams and important dates</CardDescription>
+          <CardDescription>
+            Upcoming exams and important dates
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[400px]">
@@ -143,7 +167,9 @@ export default function ParentDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Grade Report</CardTitle>
-          <CardDescription>Download your child's grade report</CardDescription>
+          <CardDescription>
+            Download your child's grade report
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <PDFGenerator
@@ -157,15 +183,12 @@ export default function ParentDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Exam Correction Request</CardTitle>
-          <CardDescription>Upload scanned exam correction request</CardDescription>
+          <CardDescription>
+            Upload scanned exam correction request
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <FileUploader 
-            userId={user.id} 
-            folder="exam_corrections" 
-            bucket="documents" 
-            documentType="exam_correction" 
-          />
+          <FileUploader />
         </CardContent>
       </Card>
     </div>

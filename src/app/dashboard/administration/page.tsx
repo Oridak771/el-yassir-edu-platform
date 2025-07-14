@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import CalendarView from '@/components/CalendarView';
-import Chart from '@/components/Chart';
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 import PDFGenerator from '@/components/PDFGenerator';
 import NotificationBell from '@/components/NotificationBell';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';

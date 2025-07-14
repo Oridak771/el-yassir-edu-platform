@@ -65,10 +65,10 @@ const allSidebarItems: SidebarItem[] = [
   { name: 'Grade Entry', href: '/dashboard/professor/grades', icon: <Edit3 className="h-4 w-4 ml-2" />, roles: ['professor'] },
   { name: 'Absence Tracking', href: '/dashboard/professor/absences', icon: <Bell className="h-4 w-4 ml-2" />, roles: ['professor'] },
   { name: 'Send Notifications', href: '/dashboard/professor/notifications', icon: <MessageSquare className="h-4 w-4 ml-2" />, roles: ['professor'] },
-  { name: 'ORIENTATION TOOLS', href: '#', icon: <Briefcase className="h-5 w-5" />, roles: ['orientation'], isHeader: true },
+  { name: 'ORIENTATION TOOLS', href: '#', icon: <UserCog className="h-5 w-5" />, roles: ['orientation'], isHeader: true },
   { name: 'Orientation Overview', href: '/dashboard/orientation', icon: <Home className="h-4 w-4 ml-2" />, roles: ['orientation'] },
   { name: 'Student Files', href: '/dashboard/orientation/students', icon: <FileText className="h-4 w-4 ml-2" />, roles: ['orientation'] },
-  { name: 'Parent Meetings', href: '/dashboard/orientation/meetings', icon: <Users className="h-4 w-4 ml-2" />, roles: ['orientation'] },
+  { name: 'Meetings', href: '/dashboard/orientation/meetings', icon: <Calendar className="h-4 w-4 ml-2" />, roles: ['orientation'] },
 ];
 
 interface DashboardLayoutProps {
@@ -92,22 +92,20 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
     setOpenSections(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
-  const renderSidebarItem = (item: SidebarItem, isSubItem = false) => {
+  const renderSidebarItem = (item: SidebarItem, key: React.Key, isSubItem = false) => {
     const isActive = pathname === item.href;
 
     if (item.isHeader) {
       return (
-        <div
-          className={`px-3 py-2 text-xs font-semibold uppercase text-gray-400 tracking-wider ${collapsed ? 'text-center' : ''}`}
-        >
-          {collapsed ? item.icon : item.name}
+        <div key={key} className={`px-3 py-2 text-xs font-semibold uppercase ${collapsed ? 'text-center' : ''}`}>
+          {!collapsed && item.name}
         </div>
       );
     }
 
     return (
       <Link
-        key={item.name}
+        key={key}
         href={item.href}
         className={`flex items-center p-2 text-gray-300 rounded-lg hover:bg-gray-700 ${isActive ? 'bg-gray-700' : ''} ${isSubItem ? 'pl-8' : ''}`}
       >
@@ -142,7 +140,7 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
 
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
-            {filteredSidebarItems.map((item) => renderSidebarItem(item))}
+            {filteredSidebarItems.map((item) => renderSidebarItem(item, item.name))}
           </nav>
         </div>
 
@@ -192,7 +190,7 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
 
             <div className="flex-1 overflow-y-auto py-4">
               <nav className="space-y-1 px-2">
-                {filteredSidebarItems.map((item) => renderSidebarItem(item))}
+                {filteredSidebarItems.map((item) => renderSidebarItem(item, item.name))}
               </nav>
             </div>
 

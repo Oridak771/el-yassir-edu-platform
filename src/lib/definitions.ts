@@ -1,32 +1,29 @@
 // This file contains type definitions for the data structures used in the application.
 
-export type User = {
+export interface Notification {
   id: string;
-  name: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  link?: string;
+  created_at: string;
+}
+
+export interface User {
+  id: string;
   email: string;
   password?: string;
   role: 'admin' | 'professor' | 'parent' | 'student' | 'orientation';
-  avatar?: string;
-  class_id?: string;
-  parent_id?: string;
-  children_ids?: string[];
+  name: string;
   created_at: string;
-  // Optional fields based on role
-  department?: string; // For professors
-  children?: string[]; // For parents
-  grade_level?: string; // For students
-};
+  department?: string;
+  children?: string[];
+  grade_level?: string;
+}
 
-export type Notification = {
-  id: string;
-  user_id: string;
-  message: string;
-  read: boolean;
-  created_at: string;
-  link?: string;
-};
-
-export type Class = {
+export interface Class {
   id: string;
   name: string;
   professor_id: string;
@@ -36,20 +33,20 @@ export type Class = {
   semester: string;
   max_students: number;
   current_students: number;
-};
+}
 
-export type Grade = {
+export interface Grade {
   id: string;
   student_id: string;
   class_id: string;
   grade: number;
   term: string;
   date: string;
-  type: string;
-  comment: string;
-};
+  type: 'Exam' | 'Quiz' | 'Assignment';
+  comment?: string;
+}
 
-export type Absence = {
+export interface Absence {
   id: string;
   student_id: string;
   class_id: string;
@@ -59,4 +56,13 @@ export type Absence = {
   submitted_by: string;
   submitted_at: string;
   document_provided: boolean;
-};
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  date: string;
+  description: string;
+  participants: string[];
+  status: string;
+}

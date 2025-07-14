@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/data';
-import { User } from '@/lib/utils';
+import { User } from '@/lib/definitions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DashboardPage() {
@@ -15,7 +15,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { user } = await auth.getSession() as { user: User | null };
+        const session = await auth.getSession();
+        const user = session?.user;
         if (!user) {
           router.push('/auth/login');
           return;
@@ -33,6 +34,9 @@ export default function DashboardPage() {
             break;
           case 'professor':
             router.replace('/dashboard/professor');
+            break;
+          case 'orientation':
+            router.replace('/dashboard/orientation');
             break;
           default:
             setError(`Unknown user role: ${user.role}`);
