@@ -6,7 +6,7 @@ import { Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } fro
 import absencesData from '@/data/absences.json';
 
 export default function OrientationAfkPage() {
-  const [afkRecords] = useState(absencesData);
+  const [afkRecords] = useState(absencesData.absences);
 
   return (
     <Card>

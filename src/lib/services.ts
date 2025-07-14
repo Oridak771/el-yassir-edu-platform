@@ -1,12 +1,12 @@
-import { getData, auth } from './data';
+import { getUserById, auth } from './data';
 
 export async function getUserRole(userId: string): Promise<string | null> {
-  const user = getData.getUserById(userId);
+  const user = getUserById(userId);
   return user?.role || null;
 }
 
 export async function getUserProfile(userId: string) {
-  return getData.getUserById(userId);
+  return getUserById(userId);
 }
 
 export async function getNotifications(userId: string) {

@@ -56,11 +56,7 @@ export default function OrientationGradeAnalysisPage() {
 
   // Perform analysis when filters change
   const performAnalysis = useCallback(async () => {
-    if (
-        (analysisType === 'class_histogram' && !selectedClassId) ||
-        (analysisType === 'module_average' && (!selectedModule || !selectedLevel)) || // Module average needs level context
-        (analysisType === 'level_average' && !selectedLevel)
-    ) {
+    if (analysisType === 'module_average' && !selectedModule) {
       setChartData([]);
       return;
     }
@@ -68,17 +64,12 @@ export default function OrientationGradeAnalysisPage() {
     let newChartData: ChartDataItem[] = [];
 
     try {
-        if (analysisType === 'class_histogram' && selectedClassId) {
-            const { data: grades, error } = await supabase
-                .from('grades')
-                .select('score, total_possible')
-                .eq('class_id', selectedClassId);
-            if (error) throw error;
-
+        if (analysisType === 'class_histogram') {
+            // Histogram of all grades
             if (grades && grades.length > 0) {
                 const distribution = { '0-20%': 0, '21-40%': 0, '41-60%': 0, '61-80%': 0, '81-100%': 0 };
                 grades.forEach(g => {
-                    const percentage = (g.score / (g.total_possible || 100)) * 100;
+                    const percentage = (g.grade / 100) * 100; // Assuming grade is out of 100
                     if (percentage <= 20) distribution['0-20%']++;
                     else if (percentage <= 40) distribution['21-40%']++;
                     else if (percentage <= 60) distribution['41-60%']++;
@@ -87,40 +78,27 @@ export default function OrientationGradeAnalysisPage() {
                 });
                 newChartData = Object.entries(distribution).map(([key, value]) => ({ name: key, value }));
             }
-        } else if (analysisType === 'module_average' && selectedModule && selectedLevel) {
-            // Fetch all grades for the selected level and module
-            const { data: grades, error } = await supabase
-                .from('grades')
-                .select('score, total_possible, classes!inner(grade_level)')
-                .eq('subject', selectedModule)
-                .eq('classes.grade_level', selectedLevel);
-            if (error) throw error;
-            if (grades && grades.length > 0) {
-                const totalScore = grades.reduce((sum, g) => sum + g.score, 0);
-                const totalPossible = grades.reduce((sum, g) => sum + (g.total_possible || 100), 0);
-                const average = totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
+        } else if (analysisType === 'module_average' && selectedModule) {
+            const filteredGrades = grades.filter(g => g.subject === selectedModule);
+            if (filteredGrades && filteredGrades.length > 0) {
+                const totalScore = filteredGrades.reduce((sum, g) => sum + (g.grade || 0), 0);
+                const average = filteredGrades.length > 0 ? (totalScore / filteredGrades.length) : 0;
                 newChartData = [{ name: selectedModule, value: parseFloat(average.toFixed(1)) }];
             }
-        } else if (analysisType === 'level_average' && selectedLevel) {
-             const { data: grades, error } = await supabase
-                .from('grades')
-                .select('score, total_possible, classes!inner(grade_level)')
-                .eq('classes.grade_level', selectedLevel);
-            if (error) throw error;
+        } else if (analysisType === 'level_average') {
+            // Overall average of all grades
             if (grades && grades.length > 0) {
-                const totalScore = grades.reduce((sum, g) => sum + g.score, 0);
-                const totalPossible = grades.reduce((sum, g) => sum + (g.total_possible || 100), 0);
-                const average = totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
-                newChartData = [{ name: `Grade ${selectedLevel} Avg`, value: parseFloat(average.toFixed(1)) }];
+                const totalScore = grades.reduce((sum, g) => sum + (g.grade || 0), 0);
+                const average = grades.length > 0 ? (totalScore / grades.length) : 0;
+                newChartData = [{ name: `Overall Avg`, value: parseFloat(average.toFixed(1)) }];
             }
         }
     } catch (err) {
         console.error("Error performing analysis:", err);
     }
-
     setChartData(newChartData);
     setLoading(false);
-  }, [analysisType, selectedClassId, selectedModule, selectedLevel]);
+  }, [analysisType, selectedModule, grades]);
 
    useEffect(() => {
     performAnalysis();

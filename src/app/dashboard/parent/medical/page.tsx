@@ -28,7 +28,7 @@ export default function ParentMedicalPage() {
             </li>
           ))}
         </ul>
-        <FileUploader bucket="medical" folder="parent" userId="1" documentType="medical" onUploadComplete={() => {}} />
+        <FileUploader />
       </CardContent>
     </Card>
   );

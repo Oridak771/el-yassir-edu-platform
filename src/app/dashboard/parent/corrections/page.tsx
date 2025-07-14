@@ -28,7 +28,7 @@ export default function ParentCorrectionsPage() {
             </li>
           ))}
         </ul>
-        <FileUploader bucket="corrections" folder="parent" userId="1" documentType="correction" onUploadComplete={() => {}} />
+        <FileUploader />
       </CardContent>
     </Card>
   );

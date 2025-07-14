@@ -9,27 +9,28 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Input } from '@/components/ui/input';
 
 const exemptionsData = [
-  { id: '1', reason: 'Medical', status: 'Pending' },
-  { id: '2', reason: 'Family Emergency', status: 'Approved' },
+	{ id: '1', reason: 'Medical', status: 'Pending' },
+	{ id: '2', reason: 'Family Emergency', status: 'Approved' },
 ];
 
 export default function ParentExemptionsPage() {
-  const [exemptions] = useState(exemptionsData);
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Exemption Requests</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ul>
-          {exemptions.map(ex => (
-            <li key={ex.id} className="mb-2">
-              <strong>{ex.reason}</strong> <span className="ml-2">[{ex.status}]</span>
-            </li>
-          ))}
-        </ul>
-        <FileUploader bucket="exemptions" folder="parent" userId="1" documentType="exemption" onUploadComplete={() => {}} />
-      </CardContent>
-    </Card>
-  );
+	const [exemptions] = useState(exemptionsData);
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Exemption Requests</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<ul>
+					{exemptions.map((ex) => (
+						<li key={ex.id} className="mb-2">
+							<strong>{ex.reason}</strong>{' '}
+							<span className="ml-2">[{ex.status}]</span>
+						</li>
+					))}
+				</ul>
+				<FileUploader />
+			</CardContent>
+		</Card>
+	);
 }
