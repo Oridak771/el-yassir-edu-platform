@@ -45,6 +45,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "autoprefixer": "^10.4.19",
+    "eslint": "8.57.1",
+    "eslint-config-next": "15.3.5",
     "postcss": "^8.4.39",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.2.9",

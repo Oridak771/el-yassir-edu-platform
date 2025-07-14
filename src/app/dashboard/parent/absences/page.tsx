@@ -11,7 +11,7 @@ export default function ParentAbsencesPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your Child's Absences</CardTitle>
+        <CardTitle>Your Child&apos;s Absences</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>

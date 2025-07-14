@@ -290,11 +290,11 @@ export default function SettingsPage() {
             <CardContent>
               <form onSubmit={handleRequestChildLink} className="space-y-4">
                 <div className="space-y-1">
-                  <Label htmlFor="linkChildEmail">Child's Email Address *</Label>
+                  <Label htmlFor="linkChildEmail">Child&apos;s Email Address *</Label>
                   <Input id="linkChildEmail" type="email" value={newLinkChildEmail} onChange={e => setNewLinkChildEmail(e.target.value)} required placeholder="child@example.com" />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="linkChildName">Child's Full Name (Optional)</Label>
+                  <Label htmlFor="linkChildName">Child&apos;s Full Name (Optional)</Label>
                   <Input id="linkChildName" type="text" value={newLinkChildName} onChange={e => setNewLinkChildName(e.target.value)} placeholder="John Doe Jr." />
                 </div>
                 <div className="space-y-1">

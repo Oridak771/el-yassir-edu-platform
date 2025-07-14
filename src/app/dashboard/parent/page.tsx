@@ -168,7 +168,7 @@ export default function ParentDashboard() {
         <CardHeader>
           <CardTitle>Grade Report</CardTitle>
           <CardDescription>
-            Download your child's grade report
+            Download your child&apos;s grade report
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -172,7 +172,7 @@ export default function AdminClassesPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {classes.map((cls: any) => (
+              {classes.classes.map((cls: any) => (
                 <TableRow key={cls.id}>
                   <TableCell>{cls.name}</TableCell>
                   <TableCell>{cls.grade_level}</TableCell>

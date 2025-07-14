@@ -41,7 +41,7 @@ export default function Error({
             Something went wrong
           </CardTitle>
           <CardDescription className="text-gray-600">
-            We're experiencing some technical difficulties. This feature is coming soon and will be available shortly.
+            We&apos;re experiencing some technical difficulties. This feature is coming soon and will be available shortly.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -69,4 +69,4 @@ export default function Error({
       </Card>
     </div>
   )
-} 
+}

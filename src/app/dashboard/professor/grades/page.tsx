@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,13 +32,7 @@ export default function ProfessorGradesPage() {
   // Get professor's classes
   const myClasses = getClassesByProfessor(professor?.id || '');
 
-  useEffect(() => {
-    if (selectedClassId) {
-      loadStudentGrades();
-    }
-  }, [selectedClassId, selectedGradeType]);
-
-  const loadStudentGrades = () => {
+  const loadStudentGrades = useCallback(() => {
     // Get all students in the selected class
     const classData = getClassById(selectedClassId);
     if (classData) {
@@ -49,7 +43,6 @@ export default function ProfessorGradesPage() {
           g.class_id === selectedClassId && 
           g.type === selectedGradeType
         );
-        
         return {
           student_id: studentId,
           student_name: student?.name || 'Unknown Student',
@@ -59,7 +52,13 @@ export default function ProfessorGradesPage() {
       });
       setStudentGrades(students);
     }
-  };
+  }, [selectedClassId, selectedGradeType]);
+
+  useEffect(() => {
+    if (selectedClassId) {
+      loadStudentGrades();
+    }
+  }, [selectedClassId, selectedGradeType, loadStudentGrades]);
 
   const handleScoreChange = (studentId: string, value: string) => {
     setStudentGrades(prev => 

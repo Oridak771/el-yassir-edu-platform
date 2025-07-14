@@ -27,7 +27,7 @@ export default function NotFound() {
             Coming Soon
           </CardTitle>
           <CardDescription className="text-gray-600">
-            This page is under development and will be available soon. We're working hard to bring you the best experience.
+            This page is under development and will be available soon. We&apos;re working hard to bring you the best experience.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -52,4 +52,4 @@ export default function NotFound() {
       </Card>
     </div>
   )
-} 
+}
