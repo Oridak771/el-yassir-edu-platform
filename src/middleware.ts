@@ -1,19 +1,27 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { auth } from './lib/data'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
-  // Check if the request is for the dashboard
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    try {
-      const session = await auth.getSession()
-      if (!session.user) {
-        return NextResponse.redirect(new URL('/auth/login', request.url))
-      }
-    } catch (error) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
+export function middleware(request: NextRequest) {
+  const sessionCookie = request.cookies.get('session_user_id');
+  const { pathname } = request.nextUrl;
+
+  const hasSession = !!sessionCookie?.value;
+  const isAuthPage = pathname.startsWith('/auth');
+  const isDashboardPage = pathname.startsWith('/dashboard');
+
+  // Redirect to dashboard if a logged-in user tries to access an auth page
+  if (hasSession && isAuthPage) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  return NextResponse.next()
+  // Redirect to login if a logged-out user tries to access a dashboard page
+  if (!hasSession && isDashboardPage) {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+
+  return NextResponse.next();
 }
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/auth/:path*'],
+};

@@ -20,6 +20,7 @@ export interface Notification {
 export interface User {
   id: string;
   email: string;
+  password?: string;
   role: 'admin' | 'professor' | 'parent' | 'student' | 'orientation';
   name: string;
   created_at: string;

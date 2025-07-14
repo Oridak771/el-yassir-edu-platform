@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase'; // Uncommented
-import { Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } from '@/components/ui/table'; // Uncommented
-import { Input } from '@/components/ui/input'; // Uncommented
-import { Textarea } from '@/components/ui/textarea'; // Uncommented
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog'; // Uncommented
-import { Label } from '@/components/ui/label'; // Uncommented
-import { Badge } from '@/components/ui/badge'; // For counts
+import { Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import classesData from '@/data/classes.json';
 
 type ClassDetail = {
   id: string;
@@ -34,60 +34,11 @@ type ClassFormData = {
 };
 
 export default function AdminClassesPage() {
-  const [classes, setClasses] = useState<ClassDetail[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [classes] = useState(classesData);
   const [showClassDialog, setShowClassDialog] = useState(false);
   const [editingClass, setEditingClass] = useState<ClassDetail | null>(null);
   const [formData, setFormData] = useState<ClassFormData>({ name: '', grade_level: '', academic_year: '', room_number: '', schedule: '{}' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const fetchClasses = useCallback(async () => {
-    setLoading(true);
-    // Fetch classes
-    const { data: classesData, error: classesError } = await supabase
-        .from('classes')
-        .select('*')
-        .order('name');
-
-    if (classesError) {
-        console.error('Error fetching classes:', classesError);
-        setClasses([]);
-        setLoading(false);
-        return;
-    }
-
-    if (classesData) {
-        // For each class, fetch teacher and student counts
-        const enrichedClasses = await Promise.all(
-            classesData.map(async (cls) => {
-                const { count: teacherCount, error: teacherError } = await supabase
-                    .from('teacher_assignments')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('class_id', cls.id);
-
-                const { count: studentCount, error: studentError } = await supabase
-                    .from('class_enrollments')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('class_id', cls.id);
-                
-                if (teacherError) console.error(`Error fetching teacher count for class ${cls.id}:`, teacherError);
-                if (studentError) console.error(`Error fetching student count for class ${cls.id}:`, studentError);
-
-                return {
-                    ...cls,
-                    teacher_count: teacherCount ?? 0,
-                    student_count: studentCount ?? 0,
-                };
-            })
-        );
-        setClasses(enrichedClasses);
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchClasses();
-  }, [fetchClasses]);
 
   const resetForm = () => {
       setEditingClass(null);
@@ -137,17 +88,10 @@ export default function AdminClassesPage() {
     let error;
     if (editingClass) {
         // Update existing class
-        const { error: updateError } = await supabase
-            .from('classes')
-            .update(classDataToSave)
-            .eq('id', editingClass.id);
-        error = updateError;
+        error = null; // Placeholder for update logic
     } else {
         // Create new class
-        const { error: insertError } = await supabase
-            .from('classes')
-            .insert(classDataToSave);
-        error = insertError;
+        error = null; // Placeholder for insert logic
     }
 
     if (error) {
@@ -156,7 +100,6 @@ export default function AdminClassesPage() {
     } else {
         alert(`Class ${editingClass ? 'updated' : 'created'} successfully!`);
         resetForm();
-        fetchClasses(); // Refresh list
     }
     setIsSubmitting(false);
   };
@@ -166,14 +109,7 @@ export default function AdminClassesPage() {
           return;
       }
       setIsSubmitting(true); // Use isSubmitting to disable buttons during delete
-      const { error } = await supabase.from('classes').delete().eq('id', classId);
-      if (error) {
-          console.error("Error deleting class:", error);
-          alert(`Error deleting class: ${error.message}`);
-      } else {
-          alert(`Class "${className}" deleted successfully.`);
-          fetchClasses();
-      }
+      // Placeholder for delete logic
       setIsSubmitting(false);
   };
 
@@ -222,45 +158,29 @@ export default function AdminClassesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Classes</CardTitle>
-          {/* Add Filters/Search here */}
+          <CardTitle>Class List</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading && <p>Loading classes...</p>}
-          {!loading && classes.length === 0 && <p>No classes found. Add a new class to get started.</p>}
-          {!loading && classes.length > 0 && (
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableHeaderCell>Name</TableHeaderCell>
-                        <TableHeaderCell>Grade</TableHeaderCell>
-                        <TableHeaderCell>Academic Year</TableHeaderCell>
-                        <TableHeaderCell>Room</TableHeaderCell>
-                        <TableHeaderCell>Teachers</TableHeaderCell>
-                        <TableHeaderCell>Students</TableHeaderCell>
-                        <TableHeaderCell>Actions</TableHeaderCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {classes.map(cls => (
-                        <TableRow key={cls.id}>
-                            <TableCell>{cls.name}</TableCell>
-                            <TableCell>{cls.grade_level}</TableCell>
-                            <TableCell>{cls.academic_year}</TableCell>
-                            <TableCell>{cls.room_number || 'N/A'}</TableCell>
-                            <TableCell><Badge variant="outline">{cls.teacher_count}</Badge></TableCell>
-                            <TableCell><Badge variant="outline">{cls.student_count}</Badge></TableCell>
-                            <TableCell className="space-x-2 rtl:space-x-reverse">
-                                <Button variant="outline" size="sm" onClick={() => handleEditClick(cls)}>Edit</Button>
-                                <Button variant="outline" size="sm" onClick={() => alert(`Manage teachers for ${cls.name}`)}>Teachers</Button>
-                                <Button variant="outline" size="sm" onClick={() => alert(`Manage students for ${cls.name}`)}>Students</Button>
-                                <Button variant="destructive" size="sm" onClick={() => handleDeleteClass(cls.id, cls.name)} disabled={isSubmitting}>Delete</Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-          )}
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Name</TableHeaderCell>
+                <TableHeaderCell>Grade Level</TableHeaderCell>
+                <TableHeaderCell>Academic Year</TableHeaderCell>
+                <TableHeaderCell>Room Number</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {classes.map((cls: any) => (
+                <TableRow key={cls.id}>
+                  <TableCell>{cls.name}</TableCell>
+                  <TableCell>{cls.grade_level}</TableCell>
+                  <TableCell>{cls.academic_year}</TableCell>
+                  <TableCell>{cls.room_number || 'N/A'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 

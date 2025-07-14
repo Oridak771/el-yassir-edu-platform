@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,19 +12,11 @@ import {
   DialogDescription, 
   DialogFooter 
 } from '@/components/ui/dialog';
-<<<<<<< HEAD
-import { supabase } from '@/lib/supabase';
-=======
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg, EventContentArg } from '@fullcalendar/core';
-<<<<<<< HEAD
-=======
-import { supabase } from '@/lib/supabase';
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
 interface Event {
   id: string;
@@ -46,6 +39,11 @@ interface CalendarViewProps {
   initialView?: 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 }
 
+// Example static events
+const staticEvents = [
+  { id: '1', title: 'Sample Event', start: '2025-06-10T09:00:00', end: '2025-06-10T10:00:00' },
+];
+
 export default function CalendarView({
   userRole,
   userId,
@@ -54,57 +52,10 @@ export default function CalendarView({
   sampleEvents,
   initialView = 'dayGridMonth'
 }: CalendarViewProps) {
-  const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showEventDetails, setShowEventDetails] = useState(false);
 
-  useEffect(() => {
-    if (sampleEvents && sampleEvents.length > 0) {
-      setEvents(sampleEvents.map((event: Event) => ({
-        ...event,
-        id: event.id || crypto.randomUUID()
-      })));
-      return;
-    }
-    if (userId) {
-      fetchEvents();
-    }
-  }, [userId, sampleEvents]);
-
-  const fetchEvents = async () => {
-    try {
-      let query = supabase
-        .from('events')
-        .select('*')
-        .eq('user_id', userId);
-
-      const { data, error } = await query;
-<<<<<<< HEAD
-
-      if (error) throw error;
-
-=======
-      if (error) throw error;
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
-      const formattedEvents: Event[] = data.map((event: any) => ({
-        id: event.id || crypto.randomUUID(),
-        title: event.title || '',
-        description: event.description,
-        start: event.start_date,
-        end: event.end_date,
-        type: event.event_type,
-        event_type: event.event_type,
-        location: event.location
-      }));
-<<<<<<< HEAD
-
-=======
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
-      setEvents(formattedEvents);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    }
-  };
+  const events = sampleEvents || staticEvents;
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const event = events.find(e => e.id === clickInfo.event.id);

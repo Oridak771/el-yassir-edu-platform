@@ -3,10 +3,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase'; // Uncommented
-import Chart from '@/components/Chart'; // Uncommented
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'; // Uncommented
-import { Label } from '@/components/ui/label'; // Uncommented
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+
+const classesData = [
+  { id: '1', name: 'Class A', grade_level: 9 },
+  { id: '2', name: 'Class B', grade_level: 10 },
+];
+const subjectsData = [
+  { id: '1', name: 'Math' },
+  { id: '2', name: 'Science' },
+];
+const gradesData = [
+  { id: '1', student: 'Jane Doe', subject: 'Math', grade: 88 },
+  { id: '2', student: 'Bob Smith', subject: 'Science', grade: 92 },
+];
 
 type AnalysisType = 'class_histogram' | 'module_average' | 'level_average';
 
@@ -30,33 +41,16 @@ export default function OrientationGradeAnalysisPage() {
   const [availableModules, setAvailableModules] = useState<string[]>([]);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
 
+  const [classes] = useState(classesData);
+  const [subjects] = useState(subjectsData);
+  const [grades] = useState(gradesData);
+
   // Fetch data for filters on initial load
   useEffect(() => {
-    const fetchDataFilters = async () => {
-      setLoadingFilters(true);
-      // Fetch classes
-      const { data: classesData, error: classesError } = await supabase.from('classes').select('id, name, grade_level');
-      if (classesError) console.error("Error fetching classes:", classesError);
-      else if (classesData) {
-        setAvailableClasses(classesData.map(c => ({id: c.id, name: c.name})));
-        const levels = [...new Set(classesData.map(c => c.grade_level))].sort();
-        setAvailableLevels(levels);
-      }
-
-      // Fetch unique subjects/modules from grades table
-      const { data: subjectsData, error: subjectsError } = await supabase
-        .from('grades')
-        .select('subject', { count: 'exact', head: false }); // Using select with count to get distinct values workaround
-
-      if (subjectsError) console.error("Error fetching subjects:", subjectsError);
-      else if (subjectsData) {
-          // Post-process to get unique subjects
-          const uniqueSubjects = [...new Set(subjectsData.map((item: {subject: string}) => item.subject))].sort();
-          setAvailableModules(uniqueSubjects);
-      }
-      setLoadingFilters(false);
-    };
-    fetchDataFilters();
+    setLoadingFilters(false);
+    setAvailableClasses(classesData);
+    setAvailableLevels(classesData.map(c => c.grade_level.toString()));
+    setAvailableModules(subjectsData.map(s => s.name));
   }, []);
 
   // Perform analysis when filters change

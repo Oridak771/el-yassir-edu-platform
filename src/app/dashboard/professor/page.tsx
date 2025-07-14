@@ -1,9 +1,10 @@
-'use client'; // Make this a client component
+'use client';
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { getData } from '@/lib/data';
-import { User } from '@/lib/utils';
+import { getClassesByProfessor, getGrades, getAbsences, getUserById } from '@/lib/data';
+import { Class, Grade, Absence, User } from '@/lib/definitions';
+import { useUser } from '@/context/UserContext';
 import CalendarView from '@/components/CalendarView';
 import NotificationBell from '@/components/NotificationBell';
 import { Button } from '@/components/ui/button';
@@ -11,26 +12,24 @@ import { FileText, Edit3, Users, Bell } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfessorDashboard() {
-  // For testing, find the first professor user
-  const user = getData.getUsersByRole('professor')[0];
+  const user = useUser();
 
-  if (!user) {
+  if (user.role !== 'professor') {
     return (
       <div className="flex justify-center items-center h-screen">
         <Card>
           <CardContent>
-            <p className="text-red-500">No professor user found in the system.</p>
+            <p className="text-red-500">Access denied. You do not have permission to view this page.</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  const classes = getData.getClassesByProfessor(user.id);
-  const recentGrades = getData.grades().slice(0, 5);
-  const recentAbsences = getData.absences().slice(0, 5);
+  const classes: Class[] = getClassesByProfessor(user.id);
+  const recentGrades: Grade[] = getGrades().slice(0, 5);
+  const recentAbsences: Absence[] = getAbsences().slice(0, 5);
 
-  // Sample events for the calendar
   const sampleEvents = [
     {
       id: '1',
@@ -47,6 +46,8 @@ export default function ProfessorDashboard() {
       type: 'meeting'
     }
   ];
+
+
 
   return (
     <div className="space-y-6 p-6">
@@ -112,9 +113,9 @@ export default function ProfessorDashboard() {
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-2">Recent Grades</h3>
-                {recentGrades.map((grade) => (
+                {recentGrades.map((grade: Grade) => (
                   <div key={grade.id} className="text-sm">
-                    <p>{getData.getUserById(grade.student_id)?.name || 'Unknown Student'}</p>
+                    <p>{getUserById(grade.student_id)?.name || 'Unknown Student'}</p>
                     <p className="text-gray-500">Grade: {grade.grade}</p>
                   </div>
                 ))}
@@ -123,8 +124,8 @@ export default function ProfessorDashboard() {
                 <h3 className="font-semibold mb-2">Recent Absences</h3>
                 {recentAbsences.map((absence) => (
                   <div key={absence.id} className="text-sm">
-                    <p>{getData.getUserById(absence.student_id)?.name || 'Unknown Student'}</p>
-                    <p className="text-gray-500">{new Date(absence.date).toLocaleDateString()}</p>
+                    <p>{getUserById(absence.student_id)?.name || 'Unknown Student'}</p>
+                    <p className="text-gray-500">{new Date(absence.date).toLocaleDateString('en-GB')}</p>
                   </div>
                 ))}
               </div>

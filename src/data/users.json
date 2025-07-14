@@ -3,6 +3,7 @@
     {
       "id": "1",
       "email": "admin@example.com",
+      "password": "adminpassword",
       "role": "admin",
       "name": "Admin User",
       "created_at": "2025-01-01T00:00:00Z"
@@ -10,6 +11,7 @@
     {
       "id": "2",
       "email": "professor.smith@example.com",
+      "password": "profpassword1",
       "role": "professor",
       "name": "Boutaleb",
       "department": "Mathematics",
@@ -18,6 +20,7 @@
     {
       "id": "3",
       "email": "professor.jones@example.com",
+      "password": "profpassword2",
       "role": "professor",
       "name": "Sarah ",
       "department": "Physics",
@@ -26,6 +29,7 @@
     {
       "id": "4",
       "email": "parent.doe@example.com",
+      "password": "parentpassword1",
       "role": "parent",
       "name": "Jane Doe",
       "children": ["7", "8"],
@@ -34,6 +38,7 @@
     {
       "id": "5",
       "email": "parent.brown@example.com",
+      "password": "parentpassword2",
       "role": "parent",
       "name": "Robert Brown",
       "children": ["9"],
@@ -42,6 +47,7 @@
     {
       "id": "6",
       "email": "orientation@example.com",
+      "password": "orientationpassword",
       "role": "orientation",
       "name": "Emily Wilson",
       "created_at": "2025-01-05T00:00:00Z"
@@ -49,6 +55,7 @@
     {
       "id": "7",
       "email": "student1@example.com",
+      "password": "studentpassword1",
       "role": "student",
       "name": "Alice Doe",
       "grade_level": "10",
@@ -57,6 +64,7 @@
     {
       "id": "8",
       "email": "student2@example.com",
+      "password": "studentpassword2",
       "role": "student",
       "name": "Bob Doe",
       "grade_level": "8",
@@ -65,6 +73,7 @@
     {
       "id": "9",
       "email": "student3@example.com",
+      "password": "studentpassword3",
       "role": "student",
       "name": "Charlie Brown",
       "grade_level": "9",

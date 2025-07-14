@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Bell } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -9,27 +9,20 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { getData } from '@/lib/data';
-import { Notification } from '@/lib/utils';
+import { getUserNotifications } from '@/lib/data';
+import { Notification } from '@/lib/definitions';
 
 export default function NotificationBell({ userId }: { userId: string }) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    // Get notifications from static data
-    const userNotifications = getData.getUserNotifications(userId);
-    setNotifications(userNotifications);
-  }, [userId]);
+  // Fetch notifications directly. Since this is static data, no useEffect is needed.
+  const notifications = getUserNotifications(userId);
 
   const unreadCount = notifications.filter(n => !n.read && !readNotifications.has(n.id)).length;
 
-  const handleNotificationClick = async (notificationId: string, link?: string) => {
-    // Mark notification as read in local state
-    setReadNotifications(prev => new Set([...prev, notificationId]));
-
-    // Navigate to link if provided
+  const handleNotificationClick = (notificationId: string, link?: string | null) => {
+    setReadNotifications(prev => new Set(prev).add(notificationId));
     if (link) {
       window.location.href = link;
     }
@@ -55,8 +48,8 @@ export default function NotificationBell({ userId }: { userId: string }) {
               <DropdownMenuItem
                 key={notification.id}
                 className={`p-3 border-b cursor-pointer ${
-                  notification.read || readNotifications.has(notification.id) 
-                    ? 'bg-gray-50' 
+                  readNotifications.has(notification.id) || notification.read
+                    ? 'bg-gray-50'
                     : 'bg-blue-50'
                 }`}
                 onClick={() => handleNotificationClick(notification.id, notification.link)}

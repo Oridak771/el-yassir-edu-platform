@@ -1,30 +1,10 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import React from 'react';
 
 export default function AuthCallbackPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleEmailVerification = async () => {
-      const { error } = await supabase.auth.refreshSession();
-      if (!error) {
-        // If session is refreshed successfully after verification
-        router.push('/dashboard');
-      } else {
-        // If there's an error or the email is not verified
-        router.push('/auth/login');
-      }
-    };
-
-    handleEmailVerification();
-  }, [router]);
-
   return (
-    <div className="flex justify-center items-center h-screen">
-      <p>Verifying your email...</p>
+    <div>
+      <h1>Authentication Callback</h1>
+      <p>This is a static placeholder. Authentication is not available in this demo.</p>
     </div>
   );
 }

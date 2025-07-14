@@ -6,17 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea'; // Added for notes
-<<<<<<< HEAD
-import { supabase, getUserProfile } from '@/lib/supabase'; // Assuming getUserProfile fetches from public.users
-import { User } from '@supabase/supabase-js'; // For Supabase auth user type
-import { Badge } from '@/components/ui/badge'; // For request status
-=======
-import { supabase, getUserProfile } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
 import { Badge } from '@/components/ui/badge';
-
-// Restore all Supabase auth, profile, and settings logic as before
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
 
 type UserProfile = {
     id: string;
@@ -45,7 +35,7 @@ type ChildLinkRequest = {
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
-  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authUser, setAuthUser] = useState<UserProfile | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [linkedChildren, setLinkedChildren] = useState<LinkedChildInfo[]>([]);
   const [linkRequests, setLinkRequests] = useState<ChildLinkRequest[]>([]);
@@ -69,49 +59,35 @@ export default function SettingsPage() {
   const fetchUserData = useCallback(async () => {
     setLoading(true);
     setMessage(null);
-    const { data: { user } } = await supabase.auth.getUser();
-    setAuthUser(user);
-<<<<<<< HEAD
-
-=======
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
-    if (user) {
-      const profile = await getUserProfile(user.id) as UserProfile | null;
-      setUserProfile(profile);
-      if (profile) {
-        setFullName(profile.full_name);
-        // Fetch linked children's names
-        if (profile.role === 'parent' && profile.metadata?.children_ids && profile.metadata.children_ids.length > 0) {
-          const { data: childrenData, error: childrenError } = await supabase
-            .from('users')
-            .select('id, full_name')
-            .in('id', profile.metadata.children_ids);
-          if (childrenError) console.error("Error fetching linked children:", childrenError);
-          else setLinkedChildren(childrenData || []);
-        }
-        // Fetch child link requests
-        if (profile.role === 'parent') {
-            fetchChildLinkRequests(user.id);
-        }
+    setAuthUser({
+      id: '1',
+      email: 'user@example.com',
+      full_name: 'John Doe',
+      role: 'parent',
+      metadata: {
+        children_ids: ['2', '3']
       }
-    }
+    });
+    setUserProfile({
+      id: '1',
+      email: 'user@example.com',
+      full_name: 'John Doe',
+      role: 'parent',
+      metadata: {
+        children_ids: ['2', '3']
+      }
+    });
+    setFullName('John Doe');
+    setLinkedChildren([
+      { id: '2', full_name: 'Jane Doe' },
+      { id: '3', full_name: 'Bob Smith' }
+    ]);
+    setLinkRequests([
+      { id: '1', child_email: 'jane@example.com', child_full_name: 'Jane Doe', status: 'pending', requested_at: '2024-04-01T10:00:00' },
+      { id: '2', child_email: 'bob@example.com', child_full_name: 'Bob Smith', status: 'approved', requested_at: '2024-04-02T11:00:00' }
+    ]);
     setLoading(false);
-<<<<<<< HEAD
-  }, []); // Removed fetchChildLinkRequests from here, will be called separately
-=======
   }, []);
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
-
-  const fetchChildLinkRequests = async (parentId: string) => {
-      const { data, error } = await supabase
-        .from('child_link_requests')
-        .select('*')
-        .eq('parent_id', parentId)
-        .order('requested_at', { ascending: false });
-      if (error) console.error("Error fetching link requests:", error);
-      else setLinkRequests(data || []);
-  };
-
 
   useEffect(() => {
     fetchUserData();
@@ -127,29 +103,11 @@ export default function SettingsPage() {
     setIsSubmittingName(true);
     setMessage(null);
 
-<<<<<<< HEAD
-    const { error } = await supabase
-      .from('users')
-      .update({ full_name: fullName })
-      .eq('id', authUser.id);
-
-    if (error) {
-      console.error("Error updating name:", error);
-      setMessage({ type: 'error', text: `Failed to update name: ${error.message}` });
-    } else {
-      setMessage({ type: 'success', text: 'Full name updated successfully!' });
-      const updatedProfile = await getUserProfile(authUser.id) as UserProfile | null;
-      setUserProfile(updatedProfile);
-    }
-    setIsSubmittingName(false);
-=======
-    // Mock update name
     setTimeout(() => {
       setUserProfile(prev => prev ? { ...prev, full_name: fullName } : null);
       setMessage({ type: 'success', text: 'Full name updated successfully!' });
       setIsSubmittingName(false);
     }, 1000);
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -170,27 +128,12 @@ export default function SettingsPage() {
     setIsSubmittingPassword(true);
     setMessage(null);
 
-<<<<<<< HEAD
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-
-    if (error) {
-      console.error("Error changing password:", error);
-      setMessage({ type: 'error', text: `Failed to change password: ${error.message}` });
-    } else {
-      setMessage({ type: 'success', text: 'Password changed successfully!' });
-      setNewPassword('');
-      setConfirmNewPassword('');
-    }
-    setIsSubmittingPassword(false);
-=======
-    // Mock change password
     setTimeout(() => {
       setMessage({ type: 'success', text: 'Password changed successfully!' });
       setNewPassword('');
       setConfirmNewPassword('');
       setIsSubmittingPassword(false);
     }, 1000);
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   };
 
   const handleRequestChildLink = async (e: React.FormEvent) => {
@@ -203,39 +146,22 @@ export default function SettingsPage() {
     setIsSubmittingLinkRequest(true);
     setMessage(null);
 
-<<<<<<< HEAD
-    const { error } = await supabase
-        .from('child_link_requests')
-        .insert({
-            parent_id: authUser.id,
-            child_email: newLinkChildEmail,
-            child_full_name: newLinkChildName.trim() || null,
-            request_notes: newLinkNotes.trim() || null,
-            status: 'pending'
-        });
-
-    if (error) {
-        console.error("Error submitting child link request:", error);
-        setMessage({ type: 'error', text: `Failed to submit request: ${error.message}` });
-    } else {
-        setMessage({ type: 'success', text: 'Child link request submitted successfully. Awaiting admin approval.' });
-        setNewLinkChildEmail('');
-        setNewLinkChildName('');
-        setNewLinkNotes('');
-        fetchChildLinkRequests(authUser.id); // Refresh requests list
-    }
-    setIsSubmittingLinkRequest(false);
-=======
-    // Mock submit child link request
     setTimeout(() => {
       setMessage({ type: 'success', text: 'Child link request submitted successfully. Awaiting admin approval.' });
       setNewLinkChildEmail('');
       setNewLinkChildName('');
       setNewLinkNotes('');
-      fetchChildLinkRequests(authUser.id); // Refresh requests list
+      setLinkRequests(prev => [...prev, {
+        id: '3',
+        child_email: newLinkChildEmail,
+        child_full_name: newLinkChildName.trim() || null,
+        request_notes: newLinkNotes.trim() || null,
+        status: 'pending',
+        requested_at: new Date().toISOString(),
+        review_comments: null
+      }]);
       setIsSubmittingLinkRequest(false);
     }, 1000);
->>>>>>> 90d3ac78f9d27dce9c7a5880abde4b7506fb9702
   };
 
   const getStatusBadgeVariant = (status: string): "default" | "destructive" | "outline" | "secondary" | null | undefined => {
@@ -275,7 +201,7 @@ export default function SettingsPage() {
           <form onSubmit={handleUpdateName} className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={authUser.email || ''} disabled />
+              <Input id="email" type="email" value={authUser.email} disabled />
               <p className="text-xs text-gray-500">Email address cannot be changed here.</p>
             </div>
             <div className="space-y-1">
@@ -397,7 +323,7 @@ export default function SettingsPage() {
                                     <div>
                                         <p className="font-semibold">Child Email: {req.child_email}</p>
                                         {req.child_full_name && <p className="text-sm">Child Name: {req.child_full_name}</p>}
-                                        <p className="text-xs text-gray-500">Requested: {new Date(req.requested_at).toLocaleDateString()}</p>
+                                        <p className="text-xs text-gray-500">Requested: {new Date(req.requested_at).toLocaleDateString('en-GB')}</p>
                                     </div>
                                     <Badge variant={getStatusBadgeVariant(req.status)} className="capitalize">{req.status}</Badge>
                                 </div>

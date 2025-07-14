@@ -1,3 +1,5 @@
+"use client";
+
 // ShadCN-style Table components
 import * as React from "react";
 

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getData } from '@/lib/data';
+import { auth } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,49 +20,27 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
-    try {
-      if (!role) {
-        setError('Please select your role');
-        return;
-      }
-
-      // In this static version, we'll check if a user exists with this email and role
-      const users = getData.users();
-      const user = users.find(u => u.email === email && u.role === role);
-
-      if (user) {
-        // In a real app, we'd check the password hash and store the session
-        // For testing, any password works
-
-        // Redirect based on role
-        switch (role) {
-          case 'admin':
-            router.push('/dashboard/administration');
-            break;
-          case 'professor':
-            router.push('/dashboard/professor');
-            break;
-          case 'parent':
-            router.push('/dashboard/parent');
-            break;
-          case 'orientation':
-            router.push('/dashboard/orientation');
-            break;
-          default:
-            router.push('/dashboard');
-        }
-      } else {
-        setError('Invalid credentials or role');
-      }
-    } catch (err) {
-      setError('An error occurred during login');
-      console.error('Login error:', err);
+    if (!role) {
+      setError('Please select your role');
+      return;
     }
 
-    setLoading(false);
+    setLoading(true);
+
+    try {
+      const { user } = await auth.signIn(email, password, role);
+      if (user) {
+        // Redirect to the dashboard
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

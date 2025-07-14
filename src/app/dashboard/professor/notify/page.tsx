@@ -28,6 +28,7 @@ export default function ProfessorNotifyPage() {
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationMessage, setNotificationMessage] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [notificationCounter, setNotificationCounter] = useState(1);
 
   // Get professor data
   const professor = getData.getUsersByRole('professor')[0];
@@ -57,7 +58,7 @@ export default function ProfessorNotifyPage() {
     }
 
     const newNotification = {
-      id: crypto.randomUUID(),
+      id: `notification_${notificationCounter}`,
       user_id: targetType === 'class' || targetType === 'parents_of_class'
         ? selectedClassId
         : selectedStudentId,
@@ -74,9 +75,10 @@ export default function ProfessorNotifyPage() {
     // Show success message
     setShowSuccess(true);
 
-    // Reset form
+    // Reset form and increment counter
     setNotificationTitle('');
     setNotificationMessage('');
+    setNotificationCounter(prev => prev + 1);
   };
 
   return (

@@ -61,7 +61,7 @@ type PDFGeneratorProps = {
 };
 
 export default function PDFGenerator({
-  title,
+  title = 'Document',
   filename: initialFilename,
   template,
   fields: initialFields,
@@ -254,7 +254,7 @@ export default function PDFGenerator({
             </Button>
           </div>
           <div className="text-sm text-gray-500">
-            Click the button to {promptFields && promptFields.length > 0 ? 'configure and ' : ''}generate and download the {title.toLowerCase()}.
+            Click the button to {promptFields && promptFields.length > 0 ? 'configure and ' : ''}generate and download the {(title || 'Document').toLowerCase()}.
           </div>
         </CardContent>
       </Card>
@@ -263,7 +263,7 @@ export default function PDFGenerator({
         <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Configure {title}</DialogTitle>
+              <DialogTitle>Configure {title || 'Document'}</DialogTitle>
               <DialogDescription>
                 Please provide the following details to generate the document.
               </DialogDescription>
@@ -284,7 +284,7 @@ export default function PDFGenerator({
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowPromptDialog(false)}>Cancel</Button>
               <Button onClick={handlePromptDialogSubmit} disabled={isGenerating}>
-                {isGenerating ? 'Generating...' : `Generate ${title}`}
+                {isGenerating ? 'Generating...' : `Generate ${title || 'Document'}`}
               </Button>
             </DialogFooter>
           </DialogContent>

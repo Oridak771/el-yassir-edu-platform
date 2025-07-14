@@ -187,7 +187,7 @@ export default function ProfessorClassesPage() {
                           <TableCell>{grade.type}</TableCell>
                           <TableCell>{grade.grade}/100</TableCell>
                           <TableCell>
-                            {new Date(grade.date).toLocaleDateString()}
+                            {new Date(grade.date).toLocaleDateString('en-GB')}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -212,7 +212,7 @@ export default function ProfessorClassesPage() {
                             {getData.getUserById(absence.student_id)?.name}
                           </TableCell>
                           <TableCell>
-                            {new Date(absence.date).toLocaleDateString()}
+                            {new Date(absence.date).toLocaleDateString('en-GB')}
                           </TableCell>
                           <TableCell>
                             <span className={`px-2 py-1 rounded-full text-xs ${

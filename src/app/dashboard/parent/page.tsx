@@ -88,7 +88,7 @@ export default function ParentDashboard() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
-                    Date: {new Date(absence.date).toLocaleDateString()}
+                    Date: {new Date(absence.date).toLocaleDateString('en-GB')}
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
                     Reason: {absence.reason}
