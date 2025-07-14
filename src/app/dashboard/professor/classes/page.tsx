@@ -3,7 +3,15 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getData } from '@/lib/data';
+import {
+  getUsersByRole,
+  getClassesByProfessor,
+  getUserById,
+  getUsers,
+  getClassById,
+  getGrades,
+  getAbsences
+} from '@/lib/data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell } from '@/components/ui/table';
 import { FileText, Users, Calendar, GraduationCap, Clock } from 'lucide-react';
@@ -13,40 +21,39 @@ export default function ProfessorClassesPage() {
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
   // Get current professor
-  const professor = getData.getUsersByRole('professor')[0];
-  
+  const professor = getUsersByRole('professor')[0];
   // Get professor's classes
-  const myClasses = getData.getClassesByProfessor(professor?.id || '');
+  const myClasses = getClassesByProfessor(professor?.id || '');
 
   // Get students for selected class
   const enrolledStudents = selectedClass
-    ? getData.users().filter(user => 
-        getData.getClassById(selectedClass)?.students.includes(user.id)
+    ? getUsers().filter(user => 
+        getClassById(selectedClass)?.students.includes(user.id)
       )
     : [];
 
   // Get grades and absences for the selected class or student
   const classGrades = selectedClass
-    ? getData.grades().filter(g => 
+    ? getGrades().filter(g => 
         g.class_id === selectedClass &&
         (!selectedStudent || g.student_id === selectedStudent)
       )
     : [];
 
   const classAbsences = selectedClass
-    ? getData.absences().filter(a => 
+    ? getAbsences().filter(a => 
         a.class_id === selectedClass &&
         (!selectedStudent || a.student_id === selectedStudent)
       )
     : [];
 
   const calculateStudentStats = (studentId: string) => {
-    const studentGrades = getData.grades().filter(g => 
+    const studentGrades = getGrades().filter(g => 
       g.class_id === selectedClass && 
       g.student_id === studentId
     );
     
-    const studentAbsences = getData.absences().filter(a => 
+    const studentAbsences = getAbsences().filter(a => 
       a.class_id === selectedClass && 
       a.student_id === studentId
     );
@@ -107,7 +114,7 @@ export default function ProfessorClassesPage() {
               </CardTitle>
               <CardDescription>
                 {selectedStudent 
-                  ? `Viewing student: ${getData.getUserById(selectedStudent)?.name}`
+                  ? `Viewing student: ${getUserById(selectedStudent)?.name}`
                   : 'Class overview and student list'
                 }
               </CardDescription>
@@ -182,7 +189,7 @@ export default function ProfessorClassesPage() {
                       {classGrades.map((grade) => (
                         <TableRow key={grade.id}>
                           <TableCell>
-                            {getData.getUserById(grade.student_id)?.name}
+                            {getUserById(grade.student_id)?.name}
                           </TableCell>
                           <TableCell>{grade.type}</TableCell>
                           <TableCell>{grade.grade}/100</TableCell>
@@ -209,7 +216,7 @@ export default function ProfessorClassesPage() {
                       {classAbsences.map((absence) => (
                         <TableRow key={absence.id}>
                           <TableCell>
-                            {getData.getUserById(absence.student_id)?.name}
+                            {getUserById(absence.student_id)?.name}
                           </TableCell>
                           <TableCell>
                             {new Date(absence.date).toLocaleDateString('en-GB')}

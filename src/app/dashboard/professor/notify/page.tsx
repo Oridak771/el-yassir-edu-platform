@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { getData } from '@/lib/data';
+import {
+  getUsersByRole,
+  getClassesByProfessor,
+  getUserById
+} from '@/lib/data';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface StudentInfo {
@@ -31,13 +35,13 @@ export default function ProfessorNotifyPage() {
   const [notificationCounter, setNotificationCounter] = useState(1);
 
   // Get professor data
-  const professor = getData.getUsersByRole('professor')[0];
-  const classes = getData.getClassesByProfessor(professor?.id || '');
+  const professor = getUsersByRole('professor')[0];
+  const classes = getClassesByProfessor(professor?.id || '');
   const classesWithStudents: ClassInfo[] = classes.map(cls => ({
     id: cls.id,
     name: cls.name,
     students: cls.students.map(studentId => {
-      const student = getData.getUserById(studentId);
+      const student = getUserById(studentId);
       return {
         id: studentId,
         name: student?.name || 'Unknown Student'
